@@ -45,9 +45,9 @@ export const refreshToken = (accessToken, refreshToken) => {
     });
 };
 
-export const getFavorites = (accessToken, userId) => {
+export const getItems = (accessToken, userId, favorite = true) => {
   return axios.post(itemEndpoint, {
-      favorites_only: true,
+      favorites_only: favorite,
       origin: {
         latitude: 0.0,
         longitude: 0.0,

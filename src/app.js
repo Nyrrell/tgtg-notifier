@@ -1,10 +1,15 @@
+import { KeyvFile } from "keyv-file";
+import Keyv from "@keyvhq/core";
 import cron from 'node-cron';
 import "dotenv/config";
 
-import * as api from './api.js';
 import * as discord from './discord.js';
+import * as api from './api.js';
 
-const { EMAIL, USER_ID, ACCESS_TOKEN, REFRESH_TOKEN } = process.env
+const { EMAIL, USER_ID, ACCESS_TOKEN, REFRESH_TOKEN, TIMEZONE } = process.env;
+
+const db = new Keyv({ store: new KeyvFile({ filename: './db.json' }) });
+
 
 class TGTGClient {
   constructor(email) {
@@ -21,7 +26,6 @@ class TGTGClient {
   login = async () => this.alreadyLogged() ? await this.refreshAccessToken() : await this.loginByEmail();
 
   refreshAccessToken = async () => {
-    console.log('oui')
     try {
       const { data } = await api.refreshToken(this.accessToken, this.refreshToken)
       this.accessToken = data['access_token']
@@ -59,12 +63,37 @@ class TGTGClient {
       console.error(e)
     }
   }
+
+  getItems = async () => {
+    try {
+      const { data } = await api.getItems(this.accessToken, this.userID);
+      for (const store of data['items']) {
+        await this.compareStock(store)
+        await db.set(store['item']['item_id'], store['items_available'])
+      }
+    } catch (e) {
+      if (e.response?.status === 401) return this.refreshAccessToken()
+    }
+  }
+
+  compareStock = async (store) => {
+    const stock = await db.get(store['item']['item_id']);
+    if (store['items_available'] > stock)
+      return discord.sendNotif(store);
+  }
+
+  monitor = cron.schedule('* * * * *', async () => {
+      await this.getItems()
+    }, { scheduled: false, timezone: TIMEZONE }
+  );
+
 }
 
 const main = async () => {
   const client = new TGTGClient(EMAIL);
+
   await client.login();
-  console.log(client)
+  await client.monitor.start();
 };
 
 await main();
