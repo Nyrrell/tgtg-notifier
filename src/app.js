@@ -57,7 +57,8 @@ class TGTGClient {
         this.accessToken = data['access_token']
         this.refreshToken = data['refresh_token']
         this.userID = data['startup_data']['user']['user_id'];
-
+      } else {
+        console.log("❌ Connection failed, check your settings or validate your connection within the allotted time.");
       }
     } catch (e) {
       console.error(e)
