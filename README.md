@@ -26,7 +26,7 @@ LOCALE=xxx         # fr-FR
 EMAIL=xxx          # Too Good To Go Email
 ```
 
-ℹ️ `USER_ID`, `ACCESS_TOKEN` and `REFRESH_TOKEN` are optional.
+ℹ️**nfo** : `USER_ID`, `ACCESS_TOKEN` and `REFRESH_TOKEN` are optional.
 ```.dotenv
 USER_ID=           # Too Good To Go UserID || Leave blank 
 ACCESS_TOKEN=      # Too Good To Go AccessToken || Leave blank 
