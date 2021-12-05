@@ -1,6 +1,6 @@
 services:
   node:
-    container_name: tgtg-notifier
+    container_name: tgtg-notifier-app
     build:
       context: .
       dockerfile: Dockerfile
