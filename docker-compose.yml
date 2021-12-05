@@ -1,0 +1,7 @@
+services:
+  node:
+    container_name: tgtg-notifier
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
