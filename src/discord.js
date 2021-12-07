@@ -1,25 +1,25 @@
 import { WebhookClient, MessageEmbed } from 'discord.js';
-import "dotenv/config";
+import { readFileSync } from 'fs';
 
-const { WEBHOOK, LOCALE, TIMEZONE } = process.env;
+const { webhook, locale, timezone } = JSON.parse(readFileSync('./config.json'));
 
-const client = new WebhookClient({ url: WEBHOOK });
+const client = new WebhookClient({ url: webhook });
 
 export const sendNotif = async (store) => {
 
   let pickupInterval
   const title = store['display_name'];
   const logo = store['item']['logo_picture']['current_url'];
-  const price = (store['item']['price_including_taxes']?.['minor_units'] / 100).toLocaleString(LOCALE,
+  const price = (store['item']['price_including_taxes']?.['minor_units'] / 100).toLocaleString(locale,
     {
       style: "currency",
       currency: "EUR"
     });
 
   if (store['pickup_interval']) {
-    const formater = new Intl.DateTimeFormat(LOCALE, { timeZone: TIMEZONE, timeStyle: "short" });
+    const formater = new Intl.DateTimeFormat(locale, { timeZone: timezone, timeStyle: "short" });
     const pickupStart = formater.format(new Date(store['pickup_interval']['start']));
-    const pickupEnd = formater.format(new Date(store['pickup_interval']['end']))
+    const pickupEnd = formater.format(new Date(store['pickup_interval']['end']));
     pickupInterval = `Pickup interval ${pickupStart} to ${pickupEnd}`;
   }
 

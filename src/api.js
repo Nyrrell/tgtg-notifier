@@ -1,16 +1,14 @@
-import axios from "axios";
-import "dotenv/config";
+import { readFileSync } from 'fs';
+import axios from 'axios';
 
-const { LOCALE } = process.env;
+const { locale } = JSON.parse(readFileSync('./config.json'));
 
 axios.defaults.baseURL = "https://apptoogoodtogo.com/api/";
 axios.defaults.withCredentials = true;
 axios.defaults.headers.common = {
-  // "accept": "application/json",
-  // "content-type": "application/json",
   "user-agent": "TGTG/21.9.3 Dalvik/2.1.0 (Linux; U; Android 6.0.1; Nexus 5 Build/M4B30Z)",
-  "accept-language": LOCALE,
-  "accept-encoding": "gzip;q=1.0, compress;q=0.5 "
+  "accept-language": locale,
+  "accept-encoding": "gzip;q=1.0, compress;q=0.5"
 };
 
 const itemEndpoint = "item/v7/";
@@ -31,8 +29,8 @@ export const authPolling = (email, pollingId) => {
     "device_type": "ANDROID",
     "email": email,
     "request_polling_id": pollingId,
-  })
-}
+  });
+};
 
 export const refreshToken = (accessToken, refreshToken) => {
   return axios.post(refreshTokenEndpoint, {
