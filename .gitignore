@@ -105,3 +105,4 @@ dist
 /.idea/
 
 /db.json
+/config.json
