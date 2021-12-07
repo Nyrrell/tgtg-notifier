@@ -1,4 +1,4 @@
-import { schedule } from 'node-cron';
+import cron from 'node-cron';
 import { KeyvFile } from 'keyv-file';
 import { readFileSync } from 'fs';
 import Keyv from '@keyvhq/core';
@@ -95,7 +95,7 @@ class TGTGClient {
       return discord.sendNotif(store);
   }
 
-  monitor = schedule('* * * * *', async () => {
+  monitor = cron.schedule('* * * * *', async () => {
       await this.getItems();
     }, { scheduled: false, timezone: timezone }
   );
