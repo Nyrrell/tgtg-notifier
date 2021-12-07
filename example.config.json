@@ -1,13 +1,13 @@
 {
   "users": [
     {
-      "Email": "Too Good To Go Email || Leave Blank",
-      "User-ID": "ℹ OPTIONAL : Too Good To Go User ID || Leave Blank",
-      "Access-Token": "ℹ OPTIONAL : Too Good To Go Access Token || Leave Blank",
-      "Refresh-Token": "ℹ OPTIONAL : Too Good To Go Refresh Token || Leave Blank"
+      "Email": "user.tgtg@mail.com",
+      "User-ID": "",
+      "Access-Token": "",
+      "Refresh-Token": ""
     }
   ],
   "timezone": "Europe/Paris",
   "locale": "fr-FR",
-  "webhook": "Discord webhook URL, example : https://discord.com/api/webhooks/123456789/ABCDEFG123456789"
+  "webhook": "https://discord.com/api/webhooks/123456789/ABCDEFG123456789"
 }
