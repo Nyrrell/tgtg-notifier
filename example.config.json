@@ -1,10 +1,12 @@
 {
   "users": [
     {
+      "Name": "Just for identify an user if you monitor multiple account",
       "Email": "user.tgtg@mail.com",
       "User-ID": "",
       "Access-Token": "",
-      "Refresh-Token": ""
+      "Refresh-Token": "",
+      "Favorite": true
     }
   ],
   "timezone": "Europe/Paris",

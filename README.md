@@ -21,10 +21,12 @@ Be sure to fill `webhook`, `timezone`, `locale` and `Email` (or `User-ID`, `Acce
 {
   "users": [
     {
+      "Name": "Just for identify an user if you monitor multiple account",
       "Email": "Too Good To Go Email",
       "User-ID": "Too Good To Go User ID", 
       "Access-Token": "Too Good To Go Access Token", 
-      "Refresh-Token": "Too Good To Go Refresh Token" 
+      "Refresh-Token": "Too Good To Go Refresh Token" ,
+      "Favorite": true
     }
   ],
   "timezone": "Europe/Paris",
