@@ -5,7 +5,9 @@ const { webhook, locale, timezone } = JSON.parse(readFileSync('./config.json'));
 
 const client = new WebhookClient({ url: webhook });
 
-export const sendNotif = async (store) => {
+await client.edit({ name: "Too Good To Go", avatar: "https://toogoodtogo.com/favicon.png"});
+
+const sendNotif = (store) => {
 
   let pickupInterval
   const title = store['display_name'];
@@ -17,15 +19,13 @@ export const sendNotif = async (store) => {
     });
 
   if (store['pickup_interval']) {
-    const formater = new Intl.DateTimeFormat(locale, { timeZone: timezone, timeStyle: "short" });
-    const pickupStart = formater.format(new Date(store['pickup_interval']['start']));
-    const pickupEnd = formater.format(new Date(store['pickup_interval']['end']));
+    const formatter = new Intl.DateTimeFormat(locale, { timeZone: timezone, timeStyle: "short" });
+    const pickupStart = formatter.format(new Date(store['pickup_interval']['start']));
+    const pickupEnd = formatter.format(new Date(store['pickup_interval']['end']));
     pickupInterval = `Pickup interval ${pickupStart} to ${pickupEnd}`;
   }
 
   return client.send({
-    username: "Too Good To Go",
-    avatarURL: logo ? logo : "https://toogoodtogo.com/favicon.png",
     embeds: [
       new MessageEmbed()
         .setColor("#27ae60")
@@ -37,4 +37,19 @@ export const sendNotif = async (store) => {
         ])
     ]
   });
-}
+};
+
+const sendMonitoring = (user = null) => {
+  return client.send({
+    embeds: [
+      new MessageEmbed()
+        .setColor("#27ae60")
+        .setTitle(`Start monitoring ${user ? `user ${user}` : ""}`)
+    ]
+  });
+};
+
+export default {
+  sendNotif,
+  sendMonitoring
+};
