@@ -138,7 +138,7 @@ class TGTGClient {
         await this.db.set(store['item']['item_id'], store['items_available']);
       }
     } catch ({ message, response }) {
-      if (response.status === 401) return this.refreshAccessToken();
+      if (response?.status === 401) return this.refreshAccessToken();
       console.error(message);
     }
   };
@@ -151,18 +151,24 @@ class TGTGClient {
 
   serviceNotifier = async (store) => {
     const title = store['display_name'];
-    const logo = store['item']['logo_picture']['current_url'];
     const items = store['items_available'].toString();
-    const price = (store['item']['price_including_taxes']?.['minor_units'] / 100).toLocaleString(LOCALE,
+    const price = (store['item']['price_including_taxes']['minor_units'] / 100).toLocaleString(LOCALE,
       {
         style: "currency",
-        currency: "EUR"
+        currency: store['item']['price_including_taxes']['code']
       });
 
-    const formatter = new Intl.DateTimeFormat(LOCALE, { timeZone: TIMEZONE, timeStyle: "short" });
-    const pickupStart = formatter.format(new Date(store['pickup_interval']['start']));
-    const pickupEnd = formatter.format(new Date(store['pickup_interval']['end']));
-    const pickupInterval = `Pickup interval ${pickupStart} to ${pickupEnd}`;
+    const pickupStart = new Date(store['pickup_interval']['start']);
+    const pickupEnd = new Date(store['pickup_interval']['end']);
+    const dateDiff = Math.ceil((pickupStart - new Date()) / 1000 / 60 / 60 / 24);
+
+    const dateTime = new Intl.DateTimeFormat(LOCALE, { timeZone: TIMEZONE, timeStyle: "short" })
+      .formatRange(pickupStart, pickupEnd);
+
+    const relativeTime = new Intl.RelativeTimeFormat(LOCALE, { numeric: 'auto' })
+      .format(dateDiff, 'day').replace(/^\w/, (c) => c.toUpperCase());
+
+    const pickupInterval = `${relativeTime} ${dateTime}`;
 
     this.notifier.sendNotif({ title, items, price, pickupInterval })
   }
