@@ -1,7 +1,6 @@
-import { readFileSync } from 'fs';
 import _axios from 'axios';
 
-const { locale } = JSON.parse(readFileSync('./config.json'));
+import { LOCALE } from "./config.js";
 
 const axios = _axios.create({
   baseURL: "https://apptoogoodtogo.com/api/",
@@ -9,7 +8,7 @@ const axios = _axios.create({
   headers: {
     "user-agent": "TGTG/21.9.3 Dalvik/2.1.0 (Linux; U; Android 6.0.1; Nexus 5 Build/M4B30Z)",
     "accept-encoding": "gzip;q=1.0, compress;q=0.5",
-    "accept-language": locale
+    "accept-language": LOCALE
   }
 });
 

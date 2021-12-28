@@ -1,45 +1,69 @@
     ⚠️ Work In Progress
-# Too Good To Go - Discord Notifier
+
+# Too Good To Go - Notifier
 
 Greatly inspired by [tgtg-python](https://github.com/ahivert/tgtg-python).
+
+### New feature :
+Too Good To Go - Notifier now support `Discord` and `WhatsApp`.
+
+⚠️ WhatsApp notification uses Puppeteer to run a real instance of Whatsapp Web to avoid getting blocked.\
+WhatsApp does not allow bots or unofficial clients on their platform, so this shouldn't be considered totally safe.
 
 ## Install
 
 ```zsh
 git clone https://github.com/Nyrrell/tgtg-notifier.git
 cd tgtg-notifer
-npm install || yarn install
+npm install
 ```
 
 ## Configure
 
-To run this project, you will need to create a `config.json` file or use `example.config.json` to set your configuration. 
+To run this project, you will need to create a `config.json` file or use `example.config.json` to set your
+configuration.
 
-Be sure to fill `webhook`, `timezone`, `locale` and `Email` (or `User-ID`, `Access-Token` and `Refresh-Token` instead of `Email`)<br>
+Be sure to fill your service `Notifier`, `Timezone`, `Locale`, `Email` (or `User-ID`, `Access-Token` and `Refresh-Token` instead
+of `Email`)<br>
 
 ```json
 {
-  "users": [
+  "Users": [
     {
-      "Name": "Just for identify an user if you monitor multiple account",
-      "Email": "Too Good To Go Email",
-      "User-ID": "Too Good To Go User ID", 
-      "Access-Token": "Too Good To Go Access Token", 
-      "Refresh-Token": "Too Good To Go Refresh Token" ,
-      "Favorite": true
+      "Name": "User 1",
+      "Email": "Too Good To Go Email User 1",
+      "User-ID": "Too Good To Go User ID [OPTIONAL]",
+      "Access-Token": "Too Good To Go Access Token [OPTIONAL]",
+      "Refresh-Token": "Too Good To Go Refresh Token [OPTIONAL]",
+      "Favorite": true,
+      "Notifier": {
+        "Discord": "Webhook URL, example : https://discord.com/api/webhooks/123456789/ABCDEFG123456789"
+      }
     }
   ],
-  "timezone": "Europe/Paris",
-  "locale": "fr-FR",
-  "webhook": "https://discord.com/api/webhooks/123456789/ABCDEFG123456789"
+  "Timezone": "Europe/Paris",
+  "Locale": "fr-FR"
 }
 ```
 
-## Run
-```zsh
-npm start || yarn start
-```
-If you don't set `User-ID`, `Access-Token` and `Refresh-Token` You should receive an email from Too Good To Go.<br>
-You must validate the login by clicking the link inside this email within 1 minute.<br>
+WhatsApp notifier configuration :
 
-After that `tgtg-notifier` start to monitor your favorite stores (once per minute) and send you a notification by discord when a store's stock is add 
+```json 
+  "Notifier": {
+    "WhatsApp": {
+      "Filename": "Name use for store whatsapp session",
+      "IdResolvable": "Resolvable phone-number with prefix OR chat name"
+    }
+  }
+```
+
+## Run
+
+```zsh
+npm start
+```
+
+If you don't set `User-ID`, `Access-Token` and `Refresh-Token` You should receive an email from Too Good To Go.<br>
+You must validate the login by clicking the link inside this email within 2 minute.<br>
+
+After that `tgtg-notifier` start to monitor your favorite stores (once per minute) and send you a notification when a store's stock is add.

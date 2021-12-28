@@ -1,15 +1,31 @@
 {
-  "users": [
+  "Users": [
     {
-      "Name": "Just for identify an user if you monitor multiple account",
+      "Name": "User 1",
       "Email": "user.tgtg@mail.com",
       "User-ID": "",
       "Access-Token": "",
       "Refresh-Token": "",
-      "Favorite": true
+      "Favorite": true,
+      "Notifier": {
+        "Discord": "Webhook URL, example : https://discord.com/api/webhooks/123456789/ABCDEFG123456789"
+      }
+    },
+    {
+      "Name": "User 2",
+      "Email": "user2.tgtg@mail.com",
+      "User-ID": "",
+      "Access-Token": "",
+      "Refresh-Token": "",
+      "Favorite": true,
+      "Notifier": {
+        "WhatsApp": {
+          "Filename": "Name use for store whatsapp session",
+          "IdResolvable": "Resolvable phone-number with prefix OR chat name"
+        }
+      }
     }
   ],
-  "timezone": "Europe/Paris",
-  "locale": "fr-FR",
-  "webhook": "https://discord.com/api/webhooks/123456789/ABCDEFG123456789"
+  "Timezone": "Europe/Paris",
+  "Locale": "fr-FR"
 }

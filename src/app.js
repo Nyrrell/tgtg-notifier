@@ -1,41 +1,52 @@
 import { KeyvFile } from 'keyv-file';
-import { readFileSync } from 'fs';
 import Keyv from '@keyvhq/core';
 import cron from 'node-cron';
 
+import whatsapp from './whatsapp.js';
 import discord from './discord.js';
 import api from './api.js';
 
-const db = new Keyv({ store: new KeyvFile({ filename: './db.json' }) });
-const { users, timezone } = JSON.parse(readFileSync('./config.json'));
+import { LOCALE, TIMEZONE, USERS } from "./config.js";
 
 class TGTGClient {
+  db;
   name;
   email;
   userID;
+  notifier;
+  favorite;
   accessToken;
   refreshToken;
-  favorite;
   maxPollingTries = new Array(24);
 
   constructor(
     {
+      "Name": name,
       "Email": email,
       "User-ID": userID,
       "Access-Token": accessToken,
       "Refresh-Token": refreshToken,
-      "Name": name,
       "Favorite": favorite = true
     }) {
+    this.name = name
     this.email = email;
     this.userID = userID;
+    this.favorite = favorite;
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
-
-    this.name = name
-    this.favorite = favorite
+    this.db = new Keyv({ store: new KeyvFile({ filename: './db.json' }), namespace: name });
   }
-  
+
+  setNotifier = async (notifier) => {
+    if (notifier['Discord']) {
+      this.notifier = await new discord(notifier['Discord']);
+    } else if (notifier['WhatsApp']) {
+      const { Filename, IdResolvable } = notifier['WhatsApp'];
+      this.notifier = await new whatsapp(Filename, IdResolvable);
+      await this.notifier.init();
+    }
+  }
+
   get credentials() {
     return {
       "Email": this.email || "No email provide",
@@ -44,7 +55,7 @@ class TGTGClient {
       "Refresh-Token": this.refreshToken
     };
   };
-  
+
   wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
   alreadyLogged = () => this.userID && this.accessToken && this.refreshToken;
@@ -124,7 +135,7 @@ class TGTGClient {
 
       for (const store of data['items']) {
         await this.compareStock(store);
-        await db.set(store['item']['item_id'], store['items_available']);
+        await this.db.set(store['item']['item_id'], store['items_available']);
       }
     } catch ({ message, response }) {
       if (response.status === 401) return this.refreshAccessToken();
@@ -133,27 +144,48 @@ class TGTGClient {
   };
 
   compareStock = async (store) => {
-    const stock = await db.get(store['item']['item_id']);
+    const stock = await this.db.get(store['item']['item_id']);
     if (store['items_available'] > stock)
-      return discord.sendNotif(store);
+      return this.serviceNotifier(store);
   };
+
+  serviceNotifier = async (store) => {
+    const title = store['display_name'];
+    const logo = store['item']['logo_picture']['current_url'];
+    const items = store['items_available'].toString();
+    const price = (store['item']['price_including_taxes']?.['minor_units'] / 100).toLocaleString(LOCALE,
+      {
+        style: "currency",
+        currency: "EUR"
+      });
+
+    const formatter = new Intl.DateTimeFormat(LOCALE, { timeZone: TIMEZONE, timeStyle: "short" });
+    const pickupStart = formatter.format(new Date(store['pickup_interval']['start']));
+    const pickupEnd = formatter.format(new Date(store['pickup_interval']['end']));
+    const pickupInterval = `Pickup interval ${pickupStart} to ${pickupEnd}`;
+
+    this.notifier.sendNotif({ title, items, price, pickupInterval })
+  }
 
   monitor = cron.schedule('* * * * *', async () => {
       await this.getItems();
-    }, { scheduled: false, timezone: timezone }
+    }, { scheduled: false, timezone: TIMEZONE }
   );
+
+  startMonitoring = () => {
+    console.log(`Start monitoring ${this.name}`);
+    this.notifier.sendMonitoring(this.name);
+    this.monitor.start();
+  };
 
 }
 
 const main = async () => {
-  for (const user of users) {
+  for (const user of USERS) {
     const client = new TGTGClient(user);
-    
     if (!await client.login()) return;
-    
-    console.log(`Start monitoring ${user['Name'] ? `user ${user['Name']}` : ''}"`);
-    await client.monitor.start();
-    await discord.sendMonitoring(user['Name']);
+    await client.setNotifier(user['Notifier']);
+    await client.startMonitoring();
   }
 };
 
