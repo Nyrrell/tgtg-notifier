@@ -34,7 +34,7 @@ class TGTGClient {
     this.favorite = favorite;
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
-    this.db = new Keyv({ store: new KeyvFile({ filename: './db.json' }), namespace: name });
+    this.db = new Keyv({ store: new KeyvFile({ filename: `./db-${name}.json` }), namespace: name });
   }
 
   setNotifier = async (notifier) => {
@@ -174,7 +174,7 @@ class TGTGClient {
 
   startMonitoring = () => {
     console.log(`Start monitoring ${this.name}`);
-    this.notifier.sendMonitoring(this.name);
+    //this.notifier.sendMonitoring(this.name);
     this.monitor.start();
   };
 
