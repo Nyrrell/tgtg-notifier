@@ -1,4 +1,4 @@
-import { KeyvFile } from 'keyv-file';
+import KeyvSqlite from "@keyvhq/sqlite";
 import Keyv from '@keyvhq/core';
 import cron from 'node-cron';
 
@@ -34,7 +34,7 @@ class TGTGClient {
     this.favorite = favorite;
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
-    this.db = new Keyv({ store: new KeyvFile({ filename: `./db-${name}.json` }), namespace: name });
+    this.db = new Keyv({ store: new KeyvSqlite({ uri: 'sqlite://db.sqlite' }), namespace: name });
   }
 
   setNotifier = async (notifier) => {
@@ -145,7 +145,7 @@ class TGTGClient {
 
   compareStock = async (store) => {
     const stock = await this.db.get(store['item']['item_id']);
-    if (store['items_available'] > stock)
+    if (store['items_available'] > stock && stock === 0)
       return this.serviceNotifier(store);
   };
 

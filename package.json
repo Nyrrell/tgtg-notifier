@@ -1,6 +1,6 @@
 {
   "name": "tgtg-notifier",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Unofficial Too Good To Go notifier app",
   "type": "module",
   "main": "src/app.js",
@@ -22,9 +22,9 @@
   "license": "ISC",
   "dependencies": {
     "@keyvhq/core": "^1.6.3",
+    "@keyvhq/sqlite": "^1.6.3",
     "axios": "^0.24.0",
     "discord.js": "^13.3.1",
-    "keyv-file": "^0.2.0",
     "node-cron": "^3.0.0",
     "qrcode-terminal": "^0.12.0",
     "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#multidevice"

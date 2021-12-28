@@ -104,6 +104,6 @@ dist
 .tern-port
 /.idea/
 
-/db*.json
+/db.sqlite
 /config.json
 /WWebJS
