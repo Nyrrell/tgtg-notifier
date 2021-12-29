@@ -1,4 +1,4 @@
-    ⚠️ Work In Progress
+> ⚠️ Work In Progress
 
 # Too Good To Go - Notifier
 
@@ -7,8 +7,8 @@ Greatly inspired by [tgtg-python](https://github.com/ahivert/tgtg-python).
 ### New feature :
 Too Good To Go - Notifier now support `Discord` and `WhatsApp`.
 
-⚠️ WhatsApp notification uses Puppeteer to run a real instance of Whatsapp Web to avoid getting blocked.\
-WhatsApp does not allow bots or unofficial clients on their platform, so this shouldn't be considered totally safe.
+> ⚠️ WhatsApp notification uses Puppeteer to run a real instance of Whatsapp Web to avoid getting blocked. 
+> WhatsApp does not allow bots or unofficial clients on their platform, so this shouldn't be considered totally safe.
 
 ## Install
 
@@ -42,20 +42,24 @@ of `Email`)<br>
     }
   ],
   "Timezone": "Europe/Paris",
-  "Locale": "fr-FR"
+  "Locale": "fr-FR",
+  "Stock": "Stock [OPTIONAL]",
+  "Price": "Prix [OPTIONAL]"
 }
 ```
 
-WhatsApp notifier configuration :
+- WhatsApp notifier configuration :
 
 ```json 
-  "Notifier": {
-    "WhatsApp": {
-      "Filename": "Name use for store whatsapp session",
-      "IdResolvable": "Resolvable phone-number with prefix OR chat name"
-    }
+"Notifier": {
+  "WhatsApp": {
+    "Filename": "Name use for store whatsapp session",
+    "IdResolvable": "Resolvable phone-number with prefix OR chat name"
   }
+}
 ```
+
+- To improve i18n, you can set `Stock` & `Price` for translate in your language, it's totally optional.
 
 ## Run
 

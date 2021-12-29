@@ -27,5 +27,7 @@
     }
   ],
   "Timezone": "Europe/Paris",
-  "Locale": "fr-FR"
+  "Locale": "fr-FR",
+  "Stock": "Stock",
+  "Price": "Prix"
 }

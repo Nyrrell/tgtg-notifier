@@ -2,8 +2,8 @@ import KeyvSqlite from "@keyvhq/sqlite";
 import Keyv from '@keyvhq/core';
 import cron from 'node-cron';
 
-import whatsapp from './whatsapp.js';
-import discord from './discord.js';
+import whatsapp from './notifier/whatsapp.js';
+import discord from './notifier/discord.js';
 import api from './api.js';
 
 import { LOCALE, TIMEZONE, USERS } from "./config.js";

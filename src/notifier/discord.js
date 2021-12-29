@@ -1,5 +1,7 @@
 import { WebhookClient, MessageEmbed } from 'discord.js';
 
+import { PRICE, STOCK } from "../config.js";
+
 export default class discord {
   constructor(webhookURL) {
     this.client = new WebhookClient({ url: webhookURL });
@@ -17,8 +19,8 @@ export default class discord {
           .setTitle(store['title'])
           .setFooter(store['pickupInterval'])
           .addFields([
-            { name: "Stock", value: store['items'], inline: true },
-            { name: "Price", value: store['price'], inline: true }
+            { name: STOCK, value: store['items'], inline: true },
+            { name: PRICE, value: store['price'], inline: true }
           ])
       ]
     });

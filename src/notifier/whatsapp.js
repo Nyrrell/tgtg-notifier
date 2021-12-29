@@ -1,6 +1,8 @@
 import { Client } from "whatsapp-web.js";
 import qrcode from "qrcode-terminal";
 
+import { PRICE, STOCK } from "../config.js";
+
 export default class whatsapp {
   idResolvable;
   filename;
@@ -56,9 +58,9 @@ export default class whatsapp {
     return this.client.sendMessage(
       this.chatId['_serialized'],
       `\`\`\`${store['title']}\`\`\` \n\n` +
-      `${'*Stock*'.padEnd(25)}*Price*\n` +
-      `${store['items'].padEnd(27 - store['items'].length)} ${store['price']}\n\n` +
-      `${store['pickupInterval'].replace('-', '·')}`);
+      `*${STOCK.padEnd(25)}${PRICE}*\n` +
+      `${store['items'].padEnd(29 - store['items'].length)} ${store['price']}\n\n` +
+      `${store['pickupInterval'].replace('–', '·')}`);
   };
 
   sendMonitoring = (user) => {
