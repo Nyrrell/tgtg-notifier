@@ -160,7 +160,7 @@ class TGTGClient {
 
     const pickupStart = new Date(store['pickup_interval']['start']);
     const pickupEnd = new Date(store['pickup_interval']['end']);
-    const dateDiff = Math.ceil((pickupStart - new Date()) / 1000 / 60 / 60 / 24);
+    const dateDiff = Math.round((pickupStart - new Date()) / 1000 / 60 / 60 / 24);
 
     const dateTime = new Intl.DateTimeFormat(LOCALE, { timeZone: TIMEZONE, timeStyle: "short" })
       .formatRange(pickupStart, pickupEnd);

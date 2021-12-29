@@ -58,7 +58,7 @@ export default class whatsapp {
       `\`\`\`${store['title']}\`\`\` \n\n` +
       `${'*Stock*'.padEnd(25)}*Price*\n` +
       `${store['items'].padEnd(27 - store['items'].length)} ${store['price']}\n\n` +
-      `${store['pickupInterval']}`);
+      `${store['pickupInterval'].replace('-', '·')}`);
   };
 
   sendMonitoring = (user) => {
