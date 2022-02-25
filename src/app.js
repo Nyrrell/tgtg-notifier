@@ -183,7 +183,6 @@ class TGTGClient {
     //this.notifier.sendMonitoring(this.name);
     this.monitor.start();
   };
-
 }
 
 const main = async () => {

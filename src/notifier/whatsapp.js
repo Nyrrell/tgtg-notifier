@@ -30,7 +30,8 @@ export default class whatsapp {
   };
 
 
-  init = () => new Promise((resolve, reject) => {
+  init = () => new Promise(async (resolve, reject) => {
+    console.log('[WhatsApp] Start init')
     this.client.initialize();
 
     this.client.on('qr', (qr) => {
