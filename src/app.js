@@ -1,15 +1,13 @@
-import KeyvSqlite from "@keyvhq/sqlite";
-import Keyv from '@keyvhq/core';
 import cron from 'node-cron';
 
 import whatsapp from './notifier/whatsapp.js';
 import discord from './notifier/discord.js';
+import database from "./database.js";
 import api from './api.js';
 
 import { LOCALE, TIMEZONE, USERS } from "./config.js";
 
 class TGTGClient {
-  db;
   name;
   email;
   userID;
@@ -34,7 +32,6 @@ class TGTGClient {
     this.favorite = favorite;
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
-    this.db = new Keyv({ store: new KeyvSqlite({ uri: 'sqlite://db.sqlite' }), namespace: name });
   }
 
   setNotifier = async (notifier) => {
@@ -79,6 +76,14 @@ class TGTGClient {
       console.error(message);
       return false;
     }
+  };
+
+  cookieNeeded = (url) => {
+    console.log(
+      'Request failed with status code 403 : Datadome Cookie needed, follow captcha here\n', url,
+      '\nget your cookie in devTools {datadome=[...]} and paste it in your config.json'
+    );
+    return process.exit(0);
   };
 
   loginByEmail = async () => {
@@ -135,16 +140,17 @@ class TGTGClient {
 
       for (const store of data['items']) {
         await this.compareStock(store);
-        await this.db.set(store['item']['item_id'], store['items_available']);
+        await database.set(this.name, store['item']['item_id'], store['items_available']);
       }
     } catch ({ message, response }) {
       if (response?.status === 401) return this.refreshAccessToken();
+      if (response?.status === 403) return this.cookieNeeded(response['data']['url']);
       console.error(message);
     }
   };
 
   compareStock = async (store) => {
-    const stock = await this.db.get(store['item']['item_id']);
+    const stock = await database.get(this.name, store['item']['item_id']);
     if (store['items_available'] > stock && stock === 0)
       return this.serviceNotifier(store);
   };
@@ -168,7 +174,7 @@ class TGTGClient {
     const relativeTime = new Intl.RelativeTimeFormat(LOCALE, { numeric: 'auto' })
       .format(dateDiff, 'day').replace(/^\w/, (c) => c.toUpperCase());
 
-    const pickupInterval = `${relativeTime} ${dateTime}`;
+    const pickupInterval = `📥 ${relativeTime} ${dateTime}`;
 
     this.notifier.sendNotif({ title, items, price, pickupInterval })
   }
@@ -180,7 +186,7 @@ class TGTGClient {
 
   startMonitoring = () => {
     console.log(`Start monitoring ${this.name}`);
-    //this.notifier.sendMonitoring(this.name);
+    this.notifier.sendMonitoring(this.name);
     this.monitor.start();
   };
 }
@@ -190,7 +196,7 @@ const main = async () => {
     const client = new TGTGClient(user);
     if (!await client.login()) return;
     await client.setNotifier(user['Notifier']);
-    await client.startMonitoring();
+    client.startMonitoring();
   }
 };
 
