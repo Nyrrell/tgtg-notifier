@@ -15,7 +15,7 @@ export default class whatsapp {
 
     this.client = new Client({
       puppeteer: { args: ['--disable-dev-shm-usage', '--no-sandbox', '--disable-gpu', '--disable-setuid-sandbox'] },
-      clientId: fileName, disableMessageHistory: false
+      disableMessageHistory: false, qrMaxRetries: 5
     });
   };
 
