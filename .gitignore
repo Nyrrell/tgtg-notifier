@@ -26,4 +26,4 @@ jspm_packages/
 /.idea/
 /database.sqlite
 /config.json
-/WWebJS
+/.wwebjs_auth
