@@ -26,8 +26,9 @@
       }
     }
   ],
+  "Cookie": "datadome={...}",
   "Timezone": "Europe/Paris",
   "Locale": "fr-FR",
-  "Stock": "Stock",
+  "Available": "Disponible",
   "Price": "Prix"
 }
