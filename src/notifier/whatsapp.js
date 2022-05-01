@@ -12,7 +12,7 @@ export default class whatsapp extends Client {
 
   constructor(fileName, idResolvable) {
     super({
-      authStrategy: new LocalAuth(),
+      authStrategy: new LocalAuth({ clientId: fileName }),
       puppeteer: { args: ['--disable-dev-shm-usage', '--no-sandbox', '--disable-gpu', '--disable-setuid-sandbox'] },
       disableMessageHistory: false, qrMaxRetries: 5
     });
