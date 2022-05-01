@@ -1,38 +1,40 @@
-import { WebhookClient, MessageEmbed } from 'discord.js';
+import axios from 'axios';
 
 import { PRICE, STOCK } from "../config.js";
 
 export default class discord {
+  webhook = axios.create();
+  webhookURL;
+
   constructor(webhookURL) {
-    this.client = new WebhookClient({ url: webhookURL });
-    this.client.edit({
-      name: 'Too Good To Go',
-      avatar: 'https://toogoodtogo.com/favicon.png'
-    }).catch(e => console.error(e))
-  }
-
-  sendNotif = (store) => {
-    return this.client.send({
-      embeds: [
-        new MessageEmbed()
-          .setColor("#27ae60")
-          .setTitle(store['title'])
-          .setFooter(store['pickupInterval'])
-          .addFields([
-            { name: STOCK, value: store['items'], inline: true },
-            { name: PRICE, value: store['price'], inline: true }
-          ])
-      ]
-    });
-  }
-
-  sendMonitoring = (user = null) => {
-    return this.client.send({
-      embeds: [
-        new MessageEmbed()
-          .setColor("#27ae60")
-          .setTitle(`Start monitoring ${user}`)
-      ]
-    });
+    this.webhookURL = webhookURL;
+    this.webhook.interceptors.request.use((config) => {
+      config.data['username'] = 'Too Good To Go';
+      config.data['avatar_url'] = 'https://toogoodtogo.com/favicon.png';
+      return config
+    })
   };
-}
+
+  sendNotif = (store) => this.webhook.post(this.webhookURL, {
+    embeds: [
+      {
+        color: parseInt("27ae60", 16),
+        title: store['title'],
+        footer: { text: store['pickupInterval'] },
+        fields: [
+          { name: STOCK, value: store['items'], inline: true },
+          { name: PRICE, value: store['price'], inline: true }
+        ]
+      }
+    ]
+  });
+
+  sendMonitoring = (user = null) => this.webhook.post(this.webhookURL, {
+    embeds: [
+      {
+        color: parseInt("27ae60", 16),
+        title: `Start monitoring ${user}`,
+      }
+    ]
+  });
+};
