@@ -14,7 +14,7 @@ Too Good To Go - Notifier now support `Discord` and `WhatsApp`.
 
 ```zsh
 git clone https://github.com/Nyrrell/tgtg-notifier.git
-cd tgtg-notifer
+cd tgtg-notifier
 npm install
 ```
 
@@ -27,7 +27,7 @@ Be sure to fill your service `Notifier`, `Name`, `Timezone`, `Locale`, `Email` (
 of `Email`).<br>
 
 ⚠️ Too Good To Go use Datadome bot protection and maybe you must provide a `Cookie`, if a cookie is needed, a link 
-appear in the console, follow it, complete captcha and get you cookie using DevTools.
+appear in the console, follow it, complete captcha and get your cookie using DevTools.
 
 ```json
 {
