@@ -1,5 +1,5 @@
-import Keyv from "@keyvhq/core";
-import KeyvSqlite from "@keyvhq/sqlite";
+import Keyv from "keyv";
+import KeyvSqlite from "@keyv/sqlite";
 
 class Database {
     private database = new Keyv({ store: new KeyvSqlite({ uri: 'sqlite://database.sqlite' }) });
