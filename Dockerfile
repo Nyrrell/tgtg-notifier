@@ -1,10 +1,11 @@
 FROM node:16-alpine
 
-ENV NODE_ENV=production
-
 WORKDIR usr/app
-COPY package.json ./
-COPY yarn.lock ./
-RUN yarn install && yarn cache clean
 COPY ./ ./
+RUN yarn install \
+&& yarn build \
+&& rm -rf node_modules \
+&& yarn install --production \
+&& yarn cache clean
+
 CMD yarn start
