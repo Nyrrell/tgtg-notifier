@@ -123,13 +123,13 @@ export class Client {
         }
     };
 
-    private getItems = async () => {
+    private getItems = async (withStock: boolean) => {
         try {
-            const { data } = await api.getItems(this.accessToken, this.userID);
+            const { data } = await api.getItems(this.accessToken, this.userID, withStock);
 
             for (const store of data['items']) {
-                await this.compareStock(store);
-                await database.set(this.name, store['item']['item_id'], store['items_available']);
+                if (withStock) await this.compareStock(store);
+                await database.set(this.name, store['item']['item_id'], withStock ? store['items_available'] : 0);
             }
         } catch (error) {
             if (error as AxiosError) {
@@ -173,23 +173,24 @@ export class Client {
         await this.webhook.sendNotif({ title, items, price, pickupInterval })
     }
 
-    private monitor = cron.schedule('* * * * *', async () => {
-        await this.getItems();
+    private monitor = cron.schedule('* * * * * *', async () => {
+        await this.getItems(true);
         }, { scheduled: false, timezone: TIMEZONE }
         );
 
-    private startMonitoring = () => {
+    private startMonitoring = async () => {
         console.log(`Start monitoring ${this.name}`);
-        this.webhook.sendMonitoring(this.name).then();
+        await this.webhook.sendMonitoring(this.name);
         this.monitor.start();
     };
 
-    public login = async (): Promise<void | Boolean> => {
+    public login = async (): Promise<void> => {
         if (!this.email && !this.alreadyLogged())
             return console.log("You must provide at least Email or User-ID, Access-Token and Refresh-Token");
 
         const logged = this.alreadyLogged() ? await this.refreshAccessToken() : await this.loginByEmail();
         if (!logged) return;
+        await this.getItems(false);
         return this.startMonitoring();
     };
 }
