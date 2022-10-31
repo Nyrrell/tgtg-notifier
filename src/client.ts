@@ -55,7 +55,7 @@ export class Client {
             this.refreshToken = data['refresh_token'];
             return true;
         } catch ({ message }) {
-            console.error('[Refresh Token] ', message);
+            console.error('[Refresh Token]', message);
             return false;
         }
     };
@@ -85,7 +85,7 @@ export class Client {
                 else console.error(message);
                 return false;
             }
-            console.error('[Login Email] ', error);
+            console.error('[Login Email]', error);
             return false;
         }
     };
@@ -138,7 +138,7 @@ export class Client {
                 if (response?.['status'] === 403) { // @ts-ignore
                     return this.cookieNeeded(response['data']['url']);
                 }
-                console.error('[Get Items] ',message);
+                console.error('[Get Items]',message);
             }
         }
     };
@@ -173,9 +173,9 @@ export class Client {
         await this.webhook.sendNotif({ title, items, price, pickupInterval })
     }
 
-    private monitor = cron.schedule('* * * * * *', async () => {
+    private monitor = cron.schedule('* * * * *', async () => {
         await this.getItems(true);
-        }, { scheduled: false, timezone: TIMEZONE }
+        }, { scheduled: false }
         );
 
     private startMonitoring = async () => {
