@@ -54,8 +54,8 @@ export class Client {
             this.accessToken = data['access_token'];
             this.refreshToken = data['refresh_token'];
             return true;
-        } catch ({message}) {
-            console.error(message);
+        } catch ({ message }) {
+            console.error('[Refresh Token] ', message);
             return false;
         }
     };
@@ -85,7 +85,7 @@ export class Client {
                 else console.error(message);
                 return false;
             }
-            console.error(error);
+            console.error('[Login Email] ', error);
             return false;
         }
     };
@@ -138,7 +138,7 @@ export class Client {
                 if (response?.['status'] === 403) { // @ts-ignore
                     return this.cookieNeeded(response['data']['url']);
                 }
-                console.error(message);
+                console.error('[Get Items] ',message);
             }
         }
     };
