@@ -143,13 +143,13 @@ export class Client {
         }
     };
 
-    private compareStock = async (store: any) => {
+    private compareStock = async (store: any): Promise<void> => {
         const stock = await database.get(this.name, store['item']['item_id']);
-        if (store['items_available'] > Boolean(stock) && stock === '0')
+        if (store['items_available'] > Boolean(stock) && stock === 0)
             return this.notifier(store);
     };
 
-    private notifier = async (store: any) => {
+    private notifier = async (store: any): Promise<void> => {
         const title = store['display_name'];
         const items = store['items_available'].toString();
         const price = (store['item']['price_including_taxes']['minor_units'] / 100)
