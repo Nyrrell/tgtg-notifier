@@ -1,11 +1,11 @@
 import { AxiosError } from "axios";
 import cron from 'node-cron';
 
-import api from './api';
-import database from "./database";
-import discord from './discord';
+import api from './api.js';
+import database from "./database.js";
+import discord from './discord.js';
 
-import { LOCALE, TIMEZONE } from "./config";
+import { LOCALE, TIMEZONE } from "./config.js";
 interface client {
     Name: string,
     Email: string,

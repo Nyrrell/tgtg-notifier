@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { COOKIE } from "./config";
+import { COOKIE } from "./config.js";
 
 const USER_AGENT = [
     "TGTG/21.12.1 Dalvik/2.1.0 (Linux; U; Android 6.0.1; Nexus 5 Build/M4B30Z)",

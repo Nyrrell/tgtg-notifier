@@ -1,8 +1,9 @@
-version: 3.9
+version: "3.9"
 services:
   node:
     container_name: tgtg-notifier-app
     build:
       context: .
       dockerfile: Dockerfile
-    restart: unless-stopped
+		volumes:
+			- ./config.json:/usr/app/config.json

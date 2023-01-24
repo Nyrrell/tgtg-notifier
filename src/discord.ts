@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { PRICE, STOCK } from "./config";
+import { PRICE, STOCK } from "./config.js";
 
 export default class discord {
     webhook = axios.create();
