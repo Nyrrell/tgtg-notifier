@@ -6,11 +6,11 @@ const configFile = await readFile("./config.json", "utf8").catch(
 if (!configFile) process.exit(1);
 
 const config = JSON.parse(configFile);
+
 const STOCK: string = config["Available"] || "Available";
 const PRICE = config["Price"] || "Price";
-const COOKIE = config["Cookie"] || null;
-const TIMEZONE = config["Timezone"];
-const LOCALE = config["Locale"];
+const TIMEZONE = config["Timezone"] || "UTC";
+const LOCALE = config["Locale"] || "en-US";
 const USERS = config["Users"];
 
-export { TIMEZONE, LOCALE, COOKIE, PRICE, STOCK, USERS };
+export { TIMEZONE, LOCALE, PRICE, STOCK, USERS };

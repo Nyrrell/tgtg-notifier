@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
 import cron from "node-cron";
-
+import { writeFile } from "node:fs/promises";
 import api from "./api.js";
 import database from "./database.js";
 import discord from "./discord.js";
@@ -59,19 +59,20 @@ export class Client {
       this.accessToken = data["access_token"];
       this.refreshToken = data["refresh_token"];
       return true;
-    } catch ({ message }) {
-      console.error("[Refresh Token]", message);
+    } catch (error) {
+      if (error as AxiosError) {
+        const { message, response } = error as AxiosError;
+        if (response?.["status"] === 403) {
+          // @ts-ignore
+          api.setCookie(response?.headers["set-cookie"]);
+          return this.refreshAccessToken();
+        }
+        console.error("[Refresh Token]", message);
+        return false;
+      }
+      console.error("[Refresh Token]", error);
       return false;
     }
-  };
-
-  private cookieNeeded = (url: string): void => {
-    console.log(
-      "Request failed with status code 403 : Datadome Cookie needed, follow captcha here\n",
-      url,
-      "\nget your cookie in devTools {datadome=[...]} and paste it in your config.json"
-    );
-    return process.exit(0);
   };
 
   private loginByEmail = async () => {
@@ -135,7 +136,7 @@ export class Client {
     }
   };
 
-  private getItems = async (withStock: boolean) => {
+  private getItems = async (withStock: boolean): Promise<void | Boolean> => {
     try {
       const { data } = await api.getItems(
         this.accessToken,
@@ -157,7 +158,8 @@ export class Client {
         if (response?.["status"] === 401) return this.refreshAccessToken();
         if (response?.["status"] === 403) {
           // @ts-ignore
-          return this.cookieNeeded(response["data"]["url"]);
+          api.setCookie(response?.headers["set-cookie"]);
+          return this.getItems(true);
         }
         console.error("[Get Items]", message);
       }

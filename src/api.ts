@@ -1,7 +1,5 @@
 import axios from "axios";
 
-import { COOKIE } from "./config.js";
-
 const USER_AGENT = [
   "TGTG/21.12.1 Dalvik/2.1.0 (Linux; U; Android 6.0.1; Nexus 5 Build/M4B30Z)",
   "TGTG/21.12.1 Dalvik/2.1.0 (Linux; U; Android 7.0; SM-G935F Build/NRD90M)",
@@ -14,28 +12,27 @@ const TGTG = axios.create({
   withCredentials: true,
   headers: {
     "user-agent": USER_AGENT[Math.floor(Math.random() * USER_AGENT.length)],
-    "accept-encoding": "gzip;q=1.0, compress;q=0.5",
+    "accept-encoding": "gzip",
     "accept-language": "LOCALE",
-    cookie: COOKIE,
   },
 });
 
-const endpoint = {
-  item: "item/v7/",
-  authByEmail: "auth/v3/authByEmail",
-  signUpByEmail: "auth/v3/signUpByEmail",
-  refreshToken: "auth/v3/token/refresh",
-  authPolling: "auth/v3/authByRequestPollingId",
+const ENDPOINT = {
+  ITEM: "item/v7/",
+  AUTH_BY_EMAIL: "auth/v3/authByEmail",
+  SIGNUP_BY_EMAIL: "auth/v3/signUpByEmail",
+  REFRESH_TOKEN: "auth/v3/token/refresh",
+  AUTH_POLLING: "auth/v3/authByRequestPollingId",
 };
 
 const loginByEmail = async (email: string) =>
-  TGTG.post(endpoint["authByEmail"], {
+  TGTG.post(ENDPOINT.AUTH_BY_EMAIL, {
     device_type: "ANDROID",
     email: email,
   });
 
 const authPolling = (email: string, pollingId: string) =>
-  TGTG.post(endpoint["authPolling"], {
+  TGTG.post(ENDPOINT.AUTH_POLLING, {
     device_type: "ANDROID",
     email: email,
     request_polling_id: pollingId,
@@ -43,7 +40,7 @@ const authPolling = (email: string, pollingId: string) =>
 
 const refreshToken = (accessToken: string, refreshToken: string) =>
   TGTG.post(
-    endpoint["refreshToken"],
+    ENDPOINT.REFRESH_TOKEN,
     {
       refresh_token: refreshToken,
     },
@@ -61,7 +58,7 @@ const getItems = (
   favorite: boolean = true
 ) =>
   TGTG.post(
-    endpoint["item"],
+    ENDPOINT.ITEM,
     {
       favorites_only: favorite,
       with_stock_only: withStock,
@@ -79,9 +76,13 @@ const getItems = (
     }
   );
 
+const setCookie = (cookie: string[]) =>
+  (TGTG.defaults.headers.common["cookie"] = cookie);
+
 export default {
   loginByEmail,
   refreshToken,
   authPolling,
   getItems,
+  setCookie,
 };
