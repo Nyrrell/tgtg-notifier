@@ -1,6 +1,5 @@
 import { AxiosError } from "axios";
 import cron from "node-cron";
-import { writeFile } from "node:fs/promises";
 import api from "./api.js";
 import database from "./database.js";
 import discord from "./discord.js";
