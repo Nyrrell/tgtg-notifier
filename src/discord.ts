@@ -15,7 +15,7 @@ export default class discord {
     });
   }
 
-  sendNotif = (store: any) =>
+  sendNewItemsAvailable = (store: any) =>
     this.webhook.post(this.webhookURL, {
       embeds: [
         {
@@ -30,12 +30,12 @@ export default class discord {
       ],
     });
 
-  sendMonitoring = (user: string = "") =>
+  sendNotification = (message: string) =>
     this.webhook.post(this.webhookURL, {
       embeds: [
         {
           color: parseInt("27ae60", 16),
-          title: `Start monitoring ${user}`,
+          title: message,
         },
       ],
     });

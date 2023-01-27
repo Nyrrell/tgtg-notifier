@@ -167,10 +167,10 @@ export class Client {
   private compareStock = async (store: any): Promise<void> => {
     const stock = await database.get(this.name, store["item"]["item_id"]);
     if (store["items_available"] > Boolean(stock) && stock === 0)
-      return this.notifier(store);
+      return this.notifyNewItems(store);
   };
 
-  private notifier = async (store: any): Promise<void> => {
+  private notifyNewItems = async (store: any): Promise<void> => {
     const title = store["display_name"];
     const items = store["items_available"].toString();
     const price = (
@@ -199,7 +199,12 @@ export class Client {
 
     const pickupInterval = `📥 ${relativeTime} ${dateTime}`;
 
-    await this.webhook.sendNotif({ title, items, price, pickupInterval });
+    await this.webhook.sendNewItemsAvailable({
+      title,
+      items,
+      price,
+      pickupInterval,
+    });
   };
 
   private monitor = cron.schedule(
@@ -211,8 +216,9 @@ export class Client {
   );
 
   private startMonitoring = async () => {
-    console.log(`Start monitoring ${this.name}`);
-    await this.webhook.sendMonitoring(this.name);
+    const message = `Start monitoring ${this.name}`;
+    console.log(message);
+    await this.webhook.sendNotification(message);
     this.monitor.start();
   };
 
