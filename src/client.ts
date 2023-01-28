@@ -1,10 +1,10 @@
 import { AxiosError } from "axios";
 import cron from "node-cron";
-import api from "./api.js";
+
 import database from "./database.js";
 import discord from "./discord.js";
+import api from "./api.js";
 
-import { LOCALE, TIMEZONE } from "./config.js";
 interface client {
   Name: string;
   Email: string;
@@ -46,6 +46,7 @@ export class Client {
 
   private wait = (ms: number): Promise<void> =>
     new Promise((resolve) => setTimeout(resolve, ms));
+
   private alreadyLogged = (): Boolean =>
     Boolean(this.userID && this.accessToken && this.refreshToken);
 
@@ -168,44 +169,7 @@ export class Client {
   private compareStock = async (store: any): Promise<void> => {
     const stock = await database.get(this.name, store["item"]["item_id"]);
     if (store["items_available"] > Boolean(stock) && stock === 0)
-      return this.notifyNewItems(store);
-  };
-
-  private notifyNewItems = async (store: any): Promise<void> => {
-    const title = store["display_name"];
-    const items = store["items_available"].toString();
-    const price = (
-      store["item"]["price_including_taxes"]["minor_units"] / 100
-    ).toLocaleString(LOCALE, {
-      style: "currency",
-      currency: store["item"]["price_including_taxes"]["code"],
-    });
-
-    const pickupStart = new Date(store["pickup_interval"]["start"]);
-    const pickupEnd = new Date(store["pickup_interval"]["end"]);
-    const dateDiff = Math.round(
-      (pickupStart.getTime() - Date.now()) / 1000 / 60 / 60 / 24
-    );
-
-    const dateTime = new Intl.DateTimeFormat(LOCALE, {
-      timeZone: TIMEZONE,
-      timeStyle: "short",
-    }).formatRange(pickupStart, pickupEnd);
-
-    const relativeTime = new Intl.RelativeTimeFormat(LOCALE, {
-      numeric: "auto",
-    })
-      .format(dateDiff, "day")
-      .replace(/^\w/, (c) => c.toUpperCase());
-
-    const pickupInterval = `📥 ${relativeTime} ${dateTime}`;
-
-    await this.webhook.sendNewItemsAvailable({
-      title,
-      items,
-      price,
-      pickupInterval,
-    });
+      return this.webhook.sendNewItemsAvailable(store);
   };
 
   private monitor = cron.schedule(
@@ -219,7 +183,7 @@ export class Client {
   private startMonitoring = async () => {
     const message = `Start monitoring ${this.name}`;
     console.log(message);
-    await this.webhook.sendNotification(message);
+    await this.webhook.sendMessage(message);
     this.monitor.start();
   };
 
@@ -232,7 +196,9 @@ export class Client {
     const logged = this.alreadyLogged()
       ? await this.refreshAccessToken()
       : await this.loginByEmail();
+
     if (!logged) return;
+
     await this.getItems(false);
     return this.startMonitoring();
   };
