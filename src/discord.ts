@@ -24,7 +24,7 @@ export default class discord {
     this.webhook.post(this.webhookURL, {
       embeds: [
         {
-						color: parseInt("2980b9", 16),
+          color: parseInt("2980b9", 16),
           title: message,
         },
       ],
