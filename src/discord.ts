@@ -10,7 +10,8 @@ export default class discord {
     this.webhookURL = webhookURL;
     this.webhook.interceptors.request.use((config) => {
       config.data["username"] = "Too Good To Go";
-      config.data["avatar_url"] = "https://toogoodtogo.com/favicon.png";
+      config.data["avatar_url"] =
+        "https://cdn.jsdelivr.net/gh/Nyrrell/tgtg-notifier@master/icon.png";
       return config;
     });
   }
