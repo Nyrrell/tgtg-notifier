@@ -1,19 +1,10 @@
 import { AxiosError } from "axios";
-import cron from "node-cron";
+import { Cron } from "croner";
 
 import database from "./database.js";
+import { User } from "./config.js";
 import discord from "./discord.js";
 import api from "./api.js";
-
-interface client {
-  Name: string;
-  Email: string;
-  "User-ID": string;
-  "Access-Token": string;
-  "Refresh-Token": string;
-  Favorite: boolean;
-  Webhook: string;
-}
 
 export class Client {
   private readonly name: string;
@@ -25,7 +16,7 @@ export class Client {
   private favorite: boolean = true;
   private readonly maxPollingTries: Array<number> = new Array(24);
 
-  constructor(user: client) {
+  constructor(user: User) {
     this.name = user["Name"];
     this.email = user["Email"];
     this.userID = user["User-ID"];
@@ -63,8 +54,7 @@ export class Client {
       if (error as AxiosError) {
         const { message, response } = error as AxiosError;
         if (response?.["status"] === 403) {
-          // @ts-ignore
-          api.setCookie(response?.headers["set-cookie"]);
+          api.setCookie(response?.headers["set-cookie"] as string[]);
           return this.refreshAccessToken();
         }
         console.error("[Refresh Token]", message);
@@ -75,7 +65,7 @@ export class Client {
     }
   };
 
-  private loginByEmail = async () => {
+  private loginByEmail = async (): Promise<void | Boolean> => {
     try {
       const { data } = await api.loginByEmail(this.email);
 
@@ -157,8 +147,7 @@ export class Client {
         const { message, response } = error as AxiosError;
         if (response?.["status"] === 401) return this.refreshAccessToken();
         if (response?.["status"] === 403) {
-          // @ts-ignore
-          api.setCookie(response?.headers["set-cookie"]);
+          api.setCookie(response?.headers["set-cookie"] as string[]);
           return this.getItems(true);
         }
         console.error("[Get Items]", message);
@@ -172,19 +161,15 @@ export class Client {
       return this.webhook.sendNewItemsAvailable(store);
   };
 
-  private monitor = cron.schedule(
-    "* * * * *",
-    async () => {
-      await this.getItems(true);
-    },
-    { scheduled: false }
-  );
+  private monitor = Cron("* * * * *", { paused: true }, async () => {
+    await this.getItems(true);
+  });
 
-  private startMonitoring = async () => {
+  private startMonitoring = async (): Promise<void> => {
     const message = `Start monitoring ${this.name}`;
     console.log(message);
     await this.webhook.sendMessage(message);
-    this.monitor.start();
+    this.monitor.resume();
   };
 
   public login = async (): Promise<void> => {

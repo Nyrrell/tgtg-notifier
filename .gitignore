@@ -24,3 +24,4 @@ node_modules/
 /config.json
 /itemExample.json
 /dist/
+/debug

@@ -7,10 +7,18 @@ if (!configFile) process.exit(1);
 
 const config = JSON.parse(configFile);
 
-const STOCK: string = config["Available"] || "Available";
-const PRICE = config["Price"] || "Price";
-const TIMEZONE = config["Timezone"] || "UTC";
-const LOCALE = config["Locale"] || "en-US";
-const USERS = config["Users"];
+export const STOCK: string = config["Available"] || "Available";
+export const PRICE: string = config["Price"] || "Price";
+export const TIMEZONE: string = config["Timezone"] || "UTC";
+export const LOCALE: string = config["Locale"] || "en-US";
+export const USERS: User[] = config["Users"];
 
-export { TIMEZONE, LOCALE, PRICE, STOCK, USERS };
+export type User = {
+  Name: string;
+  Email: string;
+  "User-ID": string;
+  "Access-Token": string;
+  "Refresh-Token": string;
+  Favorite: boolean;
+  Webhook: string;
+};

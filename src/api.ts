@@ -17,13 +17,12 @@ const TGTG = axios.create({
   },
 });
 
-const ENDPOINT = {
-  ITEM: "item/v7/",
-  AUTH_BY_EMAIL: "auth/v3/authByEmail",
-  SIGNUP_BY_EMAIL: "auth/v3/signUpByEmail",
-  REFRESH_TOKEN: "auth/v3/token/refresh",
-  AUTH_POLLING: "auth/v3/authByRequestPollingId",
-};
+enum ENDPOINT {
+  ITEM = "item/v7/",
+  AUTH_BY_EMAIL = "auth/v3/authByEmail",
+  REFRESH_TOKEN = "auth/v3/token/refresh",
+  AUTH_POLLING = "auth/v3/authByRequestPollingId",
+}
 
 const loginByEmail = async (email: string) =>
   TGTG.post(ENDPOINT.AUTH_BY_EMAIL, {

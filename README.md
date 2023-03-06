@@ -1,4 +1,4 @@
-![icon](icon.png) # Too Good To Go - Notifier
+# ![icon](icon.png) Too Good To Go - Notifier
 
 Greatly inspired by [tgtg-python](https://github.com/ahivert/tgtg-python).
 
@@ -29,7 +29,7 @@ of `Email`).<br>
       "Access-Token": "Too Good To Go Access Token [OPTIONAL]",
       "Refresh-Token": "Too Good To Go Refresh Token [OPTIONAL]",
       "Favorite": true,
-      "Webhook": "[Webhook URL], example : https://discord.com/api/webhooks/123456789/ABCDEFG123456789"
+      "Webhook": "https://discord.com/api/webhooks/123456789/ABCDEFG123456789"
     }
   ],
   "Timezone": "Europe/Paris",
