@@ -1,4 +1,4 @@
-# Too Good To Go - Notifier
+![icon](icon.png) # Too Good To Go - Notifier
 
 Greatly inspired by [tgtg-python](https://github.com/ahivert/tgtg-python).
 
