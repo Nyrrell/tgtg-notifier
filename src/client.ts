@@ -1,5 +1,4 @@
 import { AxiosError } from "axios";
-import { Cron } from "croner";
 
 import database from "./database.js";
 import { User } from "./config.js";
@@ -126,7 +125,13 @@ export class Client {
     }
   };
 
-  private getItems = async (withStock: boolean): Promise<void | Boolean> => {
+  private compareStock = async (store: any): Promise<void> => {
+    const stock = await database.get(this.name, store["item"]["item_id"]);
+    if (store["items_available"] > Boolean(stock) && stock === 0)
+      return this.webhook.sendNewItemsAvailable(store);
+  };
+
+  public getItems = async (withStock = true): Promise<void | Boolean> => {
     try {
       const { data } = await api.getItems(
         this.accessToken,
@@ -148,43 +153,31 @@ export class Client {
         if (response?.["status"] === 401) return this.refreshAccessToken();
         if (response?.["status"] === 403) {
           api.setCookie(response?.headers["set-cookie"] as string[]);
-          return this.getItems(true);
+          return this.getItems(withStock);
         }
         console.error("[Get Items]", message);
       }
     }
   };
 
-  private compareStock = async (store: any): Promise<void> => {
-    const stock = await database.get(this.name, store["item"]["item_id"]);
-    if (store["items_available"] > Boolean(stock) && stock === 0)
-      return this.webhook.sendNewItemsAvailable(store);
-  };
-
-  private monitor = Cron("* * * * *", { paused: true }, async () => {
-    await this.getItems(true);
-  });
-
-  private startMonitoring = async (): Promise<void> => {
-    const message = `Start monitoring ${this.name}`;
-    console.log(message);
-    await this.webhook.sendMessage(message);
-    this.monitor.resume();
-  };
-
-  public login = async (): Promise<void> => {
-    if (!this.email && !this.alreadyLogged())
-      return console.log(
+  public login = async (): Promise<Boolean> => {
+    if (!this.email && !this.alreadyLogged()) {
+      console.log(
         "You must provide at least Email or User-ID, Access-Token and Refresh-Token"
       );
+      return false;
+    }
 
     const logged = this.alreadyLogged()
       ? await this.refreshAccessToken()
       : await this.loginByEmail();
 
-    if (!logged) return;
+    if (!logged) return false;
 
     await this.getItems(false);
-    return this.startMonitoring();
+    const message = `Start monitoring ${this.name}`;
+    console.log(message);
+    await this.webhook.sendMessage(message);
+    return true;
   };
 }
