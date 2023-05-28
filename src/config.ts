@@ -1,9 +1,17 @@
 import { readFile } from "node:fs/promises";
+import { debuglog } from "node:util";
 
+export const debug = debuglog("dev");
+
+debug("Reading config.json file.");
 const configFile = await readFile("./config.json", "utf8").catch(
   ({ message }) => console.error(message)
 );
-if (!configFile) process.exit(1);
+
+if (!configFile) {
+  console.log("No config file provide, process exit.");
+  process.exit(1);
+}
 
 const config = JSON.parse(configFile);
 

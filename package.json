@@ -1,15 +1,16 @@
 {
   "name": "tgtg-notifier",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Too Good To Go discord notifier",
   "type": "module",
   "main": "src/app.js",
+  "license": "MIT",
   "scripts": {
-    "dev": "node --loader ts-node/esm --experimental-specifier-resolution node src/app.ts",
-    "dev:watch": "node --watch --loader ts-node/esm --experimental-specifier-resolution node src/app.ts",
+    "dev": "NODE_DEBUG=dev node --loader ts-node/esm --experimental-specifier-resolution node src/app.ts",
+    "dev:watch": "NODE_DEBUG=dev node --watch --loader ts-node/esm --experimental-specifier-resolution node src/app.ts",
     "build": "tsc",
     "start": "node dist/app.js",
-    "format": "prettier --write ."
+    "format": "prettier --write ./src"
   },
   "keywords": [
     "Too Good To Go",
