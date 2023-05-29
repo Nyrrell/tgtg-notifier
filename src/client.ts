@@ -41,7 +41,7 @@ export class Client {
     Boolean(this.userID && this.accessToken && this.refreshToken);
 
   private refreshAccessToken = async (): Promise<Boolean> => {
-    debug("[Refresh Token] %s", this.name);
+    debug(`[Refresh Token] ${this.name}`);
     try {
       const { data } = await api.refreshToken(
         this.accessToken,
@@ -49,14 +49,14 @@ export class Client {
       );
       this.accessToken = data["access_token"];
       this.refreshToken = data["refresh_token"];
-      debug("[Refresh Token] %s : OK", this.name);
+      debug(`[Refresh Token] ${this.name} : OK`);
       return true;
     } catch (error) {
-      debug("[Refresh Token] %s : KO", this.name);
+      debug(`[Refresh Token] ${this.name} : KO`);
       if (error as AxiosError) {
         const { message, response } = error as AxiosError;
         if (response?.["status"] === 403) {
-          api.setCookie(response?.headers["set-cookie"] as string[]);
+          await api.setCookie(response?.headers["set-cookie"] as string[]);
           return this.refreshAccessToken();
         }
         console.error("[Refresh Token]", message);
@@ -68,7 +68,7 @@ export class Client {
   };
 
   private loginByEmail = async (): Promise<void | Boolean> => {
-    debug("[Login Mail] %s :", this.name);
+    debug(`[Login Mail] ${this.name} :`);
     try {
       const { data } = await api.loginByEmail(this.email);
 
@@ -81,9 +81,9 @@ export class Client {
       if (data["state"] === "WAIT")
         return this.startPolling(data["polling_id"]);
 
-      debug("[Login Mail] %s : OK", this.name);
+      debug(`[Login Mail] ${this.name} : OK`);
     } catch (error) {
-      debug("[Login Mail] %s : KO", this.name);
+      debug(`[Login Mail] ${this.name} : KO`);
       if (error as AxiosError) {
         const { message, response } = error as AxiosError;
         if (response?.["status"] === 429)
@@ -97,7 +97,7 @@ export class Client {
   };
 
   private startPolling = async (pollingId: string): Promise<Boolean> => {
-    debug("[Login Polling] %s", this.name);
+    debug(`[Login Polling] ${this.name}`);
     try {
       for (const attempt of this.maxPollingTries.keys()) {
         const { data, status } = await api.authPolling(this.email, pollingId);
@@ -108,7 +108,7 @@ export class Client {
             );
           await this.wait(5000);
         } else if (status === 200) {
-          debug("[Login Polling] %s : OK", this.name);
+          debug(`[Login Polling] ${this.name} : OK`);
           console.log(`✅ ${this.name} successfully Logged`);
           this.accessToken = data["access_token"];
           this.refreshToken = data["refresh_token"];
@@ -120,7 +120,7 @@ export class Client {
       console.log("Max polling retries reached. Try again.");
       return false;
     } catch (error) {
-      debug("[Login Polling] %s : KO", this.name);
+      debug(`[Login Polling] ${this.name} : KO`);
       if (error as AxiosError) {
         const { message, response } = error as AxiosError;
         if (response?.["status"] === 429) {
@@ -164,8 +164,8 @@ export class Client {
         const { message, response } = error as AxiosError;
         if (response?.["status"] === 401) return this.refreshAccessToken();
         if (response?.["status"] === 403) {
-          debug("[Get Items] %s : SET COOKIE", this.name);
-          api.setCookie(response?.headers["set-cookie"] as string[]);
+          debug(`[Get Items] ${this.name} : SET COOKIE`);
+          await api.setCookie(response?.headers["set-cookie"] as string[]);
           return this.getItems(withStock);
         }
         console.error("[Get Items]", message);
@@ -174,7 +174,7 @@ export class Client {
   };
 
   public login = async (): Promise<Boolean> => {
-    debug("[Login] %s", this.name);
+    debug(`[Login] ${this.name}`);
     if (!this.email && !this.alreadyLogged()) {
       console.log(
         "You must provide at least Email or User-ID, Access-Token and Refresh-Token"

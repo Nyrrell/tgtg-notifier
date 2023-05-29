@@ -75,8 +75,9 @@ const getItems = (
     }
   );
 
-const setCookie = (cookie: string[]) =>
-  (TGTG.defaults.headers.common["cookie"] = cookie);
+const setCookie = (cookie: string[]): void => {
+  TGTG.defaults.headers.common["cookie"] = cookie;
+};
 
 export default {
   loginByEmail,

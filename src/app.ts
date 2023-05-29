@@ -7,7 +7,7 @@ const main = async (): Promise<void> => {
   const clientsToMonitor: Client[] = [];
 
   for await (const user of USERS) {
-    debug("[Init] %s", user.Name);
+    debug(`[Init] ${user.Name}`);
     const initClient: Client = await new Client(user);
     if (await initClient.login()) clientsToMonitor.push(initClient);
   }
