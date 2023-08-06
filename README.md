@@ -1,7 +1,7 @@
 # ![icon](icon.png) Too Good To Go - Notifier
 
-Too Good To Go - Notifier monitor your favorite TGTG Store for newly available items and notifies you with a Discord's notification.
-I make this for my personnal use only but it can be usefull for someone too.
+Too Good To Go - Notifier monitors your favorite TGTG Store for newly available items and notifies you with a Discord's notification.
+I made it for my personal use only but it may also be usefull to someone else.
 
 ## Install
 
