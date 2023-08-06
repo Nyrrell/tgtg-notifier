@@ -117,7 +117,7 @@ export class Client {
 
   private compareStock = async (store: TGTG_STORE): Promise<void> => {
     const stock = await database.get(this.name, store['item']['item_id']);
-    if (!stock || store['items_available'] > stock) await this.webhook.sendNewItemsAvailable(store);
+    if (!stock || (store['items_available'] > stock && stock === 0)) await this.webhook.sendNewItemsAvailable(store);
   };
 
   public getItems = async (withStock = true): Promise<void> => {
