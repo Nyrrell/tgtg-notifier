@@ -1,7 +1,7 @@
 import Keyv from 'keyv';
 
 class Database {
-  private database = new Keyv('sqlite://database.sqlite', { ttl: 1000 * 60 });
+  private database = new Keyv('sqlite://database.sqlite', { ttl: 10000 * 60 });
 
   set = (prefix: string, key: string, value: number, ttl?: number) => this.database.set(`${prefix}:${key}`, value, ttl);
   get = (prefix: string, key: string) => this.database.get(`${prefix}:${key}`);
