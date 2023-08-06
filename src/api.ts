@@ -1,88 +1,147 @@
-import axios from "axios";
+import { getApkVersion, sleep } from './utils.js';
+import { debugReq, debugRes } from './config.js';
 
-const USER_AGENT = [
-  "TGTG/21.12.1 Dalvik/2.1.0 (Linux; U; Android 6.0.1; Nexus 5 Build/M4B30Z)",
-  "TGTG/21.12.1 Dalvik/2.1.0 (Linux; U; Android 7.0; SM-G935F Build/NRD90M)",
-  "TGTG/21.12.1 Dalvik/2.1.0 (Linux; Android 6.0.1; SM-G920V Build/MMB29K)",
-  "TGTG/22.2.1 Dalvik/2.1.0 (Linux; U; Android 9; SM-G955F Build/PPR1.180610.011)",
-];
+class TGTG_API {
+  private readonly BASE_URL: string = 'https://apptoogoodtogo.com/api/';
+  private readonly LIST_USER_AGENT: string[] = [
+    'TGTG/{apk} Dalvik/2.1.0 (Linux; U; Android 9; Nexus 5 Build/M4B30Z)',
+    'TGTG/{apk} Dalvik/2.1.0 (Linux; U; Android 10; SM-G935F Build/NRD90M)',
+    'TGTG/{apk} Dalvik/2.1.0 (Linux; Android 12; SM-G920V Build/MMB29K)',
+  ];
+  private readonly ACCESS_TOKEN_LIFETIME = 3600 * 4;
+  private lastTimeTokenRefreshed: number = 0;
+  private captchaError: number = 0;
+  private userAgent: string = '';
+  private cookie: string = '';
 
-const TGTG = axios.create({
-  baseURL: "https://apptoogoodtogo.com/api/",
-  withCredentials: true,
-  headers: {
-    "user-agent": USER_AGENT[Math.floor(Math.random() * USER_AGENT.length)],
-    "accept-encoding": "gzip",
-    "accept-language": "LOCALE",
-  },
-});
+  private async getUserAgent(): Promise<string> {
+    const apk = await getApkVersion();
+    return this.LIST_USER_AGENT[Math.floor(Math.random() * this.LIST_USER_AGENT.length)].replace('{apk}', apk);
+  }
 
-enum ENDPOINT {
-  ITEM = "item/v7/",
-  AUTH_BY_EMAIL = "auth/v3/authByEmail",
-  REFRESH_TOKEN = "auth/v3/token/refresh",
-  AUTH_POLLING = "auth/v3/authByRequestPollingId",
+  private async fetch<T>(endpoint: string, { headers, body }: TGTG_API_PARAMS): Promise<T | Response> {
+    if (!this.userAgent) {
+      this.userAgent = await this.getUserAgent();
+    }
+    const request = this.request(this.BASE_URL + endpoint, { headers, body });
+    debugReq('%o', request);
+
+    const res = await fetch(request);
+    debugRes(`[Status Code] ${res.status}`);
+
+    this.cookie = res.headers.get('set-cookie') as string;
+    if (res.ok) {
+      this.captchaError = 0;
+      if (endpoint === ENDPOINT.AUTH_POLLING && res.status === 202) return res;
+      const json = await res.json().catch(async () => JSON.parse(await res.text()));
+      debugRes(json);
+      return json;
+    }
+
+    if (res.status === 403) {
+      console.log('❌ Captcha Error 403');
+      this.captchaError += 1;
+    } else {
+      throw res;
+    }
+
+    if (this.captchaError === 1) {
+      this.userAgent = await this.getUserAgent();
+    }
+    if (this.captchaError === 4) {
+      this.cookie = '';
+    }
+    if (this.captchaError >= 10) {
+      console.log('⚠️ Too many captcha Errors !', '💤 Waiting 10 minutes');
+      await sleep(1000 * 60);
+      console.log('♻️ Retrying');
+      this.captchaError = 0;
+    }
+    await sleep(1000);
+    return this.fetch(endpoint, { headers, body });
+  }
+
+  private request(url: string, { headers, body }: TGTG_API_PARAMS): Request {
+    return new Request(url, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        ...headers,
+        'content-type': 'application/json; charset=utf-8',
+        'user-agent': this.userAgent,
+        accept: 'application/json',
+        'accept-language': 'en-GB',
+        'accept-encoding': 'gzip',
+        ...(this.cookie && { Cookie: this.cookie }),
+      },
+      body: JSON.stringify(body),
+    });
+  }
+
+  async loginByEmail(email: string): Promise<TGTG_API_LOGIN | Response> {
+    return this.fetch(ENDPOINT.AUTH_BY_EMAIL, {
+      body: {
+        device_type: 'ANDROID',
+        email: email,
+      },
+    });
+  }
+
+  authPolling(email: string, pollingId: string) {
+    return this.fetch(ENDPOINT.AUTH_POLLING, {
+      body: {
+        device_type: 'ANDROID',
+        email: email,
+        request_polling_id: pollingId,
+      },
+    });
+  }
+
+  async refreshToken(accessToken: string, refreshToken: string): Promise<void | TGTG_API_REFRESH | Response> {
+    if (this.lastTimeTokenRefreshed && Date.now() - this.lastTimeTokenRefreshed >= this.ACCESS_TOKEN_LIFETIME) {
+      return;
+    }
+    const res = (await this.fetch(ENDPOINT.REFRESH_TOKEN, {
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+      },
+      body: {
+        refresh_token: refreshToken,
+      },
+    })) as Response | TGTG_API_REFRESH;
+    this.lastTimeTokenRefreshed = Date.now();
+    return res;
+  }
+
+  getItems(
+    accessToken: string,
+    userId: string,
+    withStock: boolean = true,
+    favorite: boolean = true
+  ): Promise<TGTG_STORES | Response> {
+    return this.fetch(ENDPOINT.ITEM, {
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+      },
+      body: {
+        favorites_only: favorite,
+        with_stock_only: withStock,
+        origin: {
+          latitude: 0.0,
+          longitude: 0.0,
+        },
+        radius: 20,
+        user_id: userId,
+      },
+    });
+  }
 }
 
-const loginByEmail = async (email: string) =>
-  TGTG.post(ENDPOINT.AUTH_BY_EMAIL, {
-    device_type: "ANDROID",
-    email: email,
-  });
+enum ENDPOINT {
+  AUTH_POLLING = 'auth/v3/authByRequestPollingId',
+  REFRESH_TOKEN = 'auth/v3/token/refresh',
+  AUTH_BY_EMAIL = 'auth/v3/authByEmail',
+  ITEM = 'item/v8/',
+}
 
-const authPolling = (email: string, pollingId: string) =>
-  TGTG.post(ENDPOINT.AUTH_POLLING, {
-    device_type: "ANDROID",
-    email: email,
-    request_polling_id: pollingId,
-  });
-
-const refreshToken = (accessToken: string, refreshToken: string) =>
-  TGTG.post(
-    ENDPOINT.REFRESH_TOKEN,
-    {
-      refresh_token: refreshToken,
-    },
-    {
-      headers: {
-        authorization: `Bearer ${accessToken}`,
-      },
-    }
-  );
-
-const getItems = (
-  accessToken: string,
-  userId: string,
-  withStock: boolean = true,
-  favorite: boolean = true
-) =>
-  TGTG.post(
-    ENDPOINT.ITEM,
-    {
-      favorites_only: favorite,
-      with_stock_only: withStock,
-      origin: {
-        latitude: 0.0,
-        longitude: 0.0,
-      },
-      radius: 20,
-      user_id: userId,
-    },
-    {
-      headers: {
-        authorization: `Bearer ${accessToken}`,
-      },
-    }
-  );
-
-const setCookie = (cookie: string[]): void => {
-  TGTG.defaults.headers.common["cookie"] = cookie;
-};
-
-export default {
-  loginByEmail,
-  refreshToken,
-  authPolling,
-  getItems,
-  setCookie,
-};
+export default new TGTG_API();
