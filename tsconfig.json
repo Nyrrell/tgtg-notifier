@@ -10,7 +10,7 @@
     "noImplicitAny": true,
     "alwaysStrict": true,
     "paths": {
-      "*": ["src/@types"]
+      "*": ["./src/@types"]
     }
   },
   "include": ["./src/**/*"]
