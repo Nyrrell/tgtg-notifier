@@ -26,7 +26,7 @@ export class Client {
 
   get credentials(): object {
     return {
-      'Email': this.email || 'No email provide',
+      Email: this.email || 'No email provide',
       'User-ID': this.userID,
       'Access-Token': this.accessToken,
       'Refresh-Token': this.refreshToken,
@@ -117,7 +117,8 @@ export class Client {
 
   private compareStock = async (store: TGTG_STORE): Promise<void> => {
     const stock = await database.get(this.name, store['item']['item_id']);
-    if (!stock || (store['items_available'] > stock && stock === 0)) await this.webhook.sendNewItemsAvailable(store);
+    if ((!stock && store['items_available'] > 0) || (store['items_available'] > stock && stock === 0 ))
+      await this.webhook.sendNewItemsAvailable(store);
   };
 
   public getItems = async (withStock = true): Promise<void> => {
