@@ -117,7 +117,7 @@ export class Client {
 
   private compareStock = async (store: TGTG_STORE): Promise<void> => {
     const stock = await database.get(this.name, store['item']['item_id']);
-    if ((!stock && store['items_available'] > 0) || (store['items_available'] > stock && stock === 0 ))
+    if ((!stock && store['items_available'] > 0) || (store['items_available'] > stock && stock === 0))
       await this.webhook.sendNewItemsAvailable(store);
   };
 
@@ -133,13 +133,13 @@ export class Client {
     } catch (error) {
       if (error as Response) {
         const { status } = error as Response;
-        if (status === 401) {
-          await this.refreshAccessToken();
-          return this.getItems(withStock);
+        if (status === 401 && (await this.refreshAccessToken())) {
+          return this.getItems();
         }
-
-        console.error('[Get Items]', Response.error());
+        console.error('[Get Items]', error);
+        return;
       }
+      console.error('[Get Items]', error);
     }
   };
 

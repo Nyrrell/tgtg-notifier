@@ -8,8 +8,6 @@ class TGTG_API {
     'TGTG/{apk} Dalvik/2.1.0 (Linux; U; Android 10; SM-G935F Build/NRD90M)',
     'TGTG/{apk} Dalvik/2.1.0 (Linux; Android 12; SM-G920V Build/MMB29K)',
   ];
-  private readonly ACCESS_TOKEN_LIFETIME = 3600 * 4;
-  private lastTimeTokenRefreshed: number = 0;
   private captchaError: number = 0;
   private userAgent: string = '';
   private cookie: string = '';
@@ -97,20 +95,15 @@ class TGTG_API {
     });
   }
 
-  async refreshToken(accessToken: string, refreshToken: string): Promise<void | TGTG_API_REFRESH | Response> {
-    if (this.lastTimeTokenRefreshed && Date.now() - this.lastTimeTokenRefreshed >= this.ACCESS_TOKEN_LIFETIME) {
-      return;
-    }
-    const res = (await this.fetch(ENDPOINT.REFRESH_TOKEN, {
+  async refreshToken(accessToken: string, refreshToken: string): Promise<TGTG_API_REFRESH | Response> {
+    return await this.fetch(ENDPOINT.REFRESH_TOKEN, {
       headers: {
         authorization: `Bearer ${accessToken}`,
       },
       body: {
         refresh_token: refreshToken,
       },
-    })) as Response | TGTG_API_REFRESH;
-    this.lastTimeTokenRefreshed = Date.now();
-    return res;
+    });
   }
 
   getItems(
