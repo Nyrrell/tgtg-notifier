@@ -1,6 +1,6 @@
 import { debuglog } from 'node:util';
 
-import { LOCALE } from './config.js';
+import { LOCALE, TIMEZONE } from './config.js';
 
 export const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -23,7 +23,7 @@ export const getApkVersion = async (): Promise<string> => {
   return apkVersion ? apkVersion : defaultApkVersion;
 };
 
-const timestamp = () => `[${new Date().toLocaleString(LOCALE)}]`.replaceAll('/', '-');
+const timestamp = () => `[${new Date().toLocaleString(LOCALE, { timeZone: TIMEZONE })}]`.replaceAll('/', '-');
 const debug = debuglog('dev');
 const debugReq = debuglog('req');
 const debugRes = debuglog('res');
