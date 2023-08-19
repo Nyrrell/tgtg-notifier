@@ -2,19 +2,20 @@ import { exit, env } from 'node:process';
 import { Cron } from 'croner';
 
 import { Client } from './client.js';
-import { debug, USERS } from './config.js';
+import { USERS } from './config.js';
+import { logger } from './utils.js';
 
 const main = async (): Promise<void> => {
   const clientsToMonitor: Client[] = [];
 
   for await (const user of USERS) {
-    debug(`[Init] ${user.Name}`);
+    logger.debug(`[Init] ${user.Name}`);
     const initClient: Client = new Client(user);
     if (await initClient.login()) clientsToMonitor.push(initClient);
   }
 
   if (!clientsToMonitor.length) {
-    console.log('No account to monitor, process exit.');
+    logger.error('No account to monitor, process exit.');
     return exit(1);
   }
 
@@ -25,5 +26,5 @@ const main = async (): Promise<void> => {
   });
 };
 
-console.log('Too Good To Go Monitor is starting in ver.', env['npm_package_version']);
+logger.info('Too Good To Go Monitor is starting in ver.', env['npm_package_version']);
 await main();

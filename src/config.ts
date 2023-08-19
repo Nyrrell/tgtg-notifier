@@ -1,12 +1,6 @@
 import { readFile } from 'node:fs/promises';
-import { debuglog } from 'node:util';
 import { exit } from 'node:process';
 
-export const debug = debuglog('dev');
-export const debugReq = debuglog('req');
-export const debugRes = debuglog('res');
-
-debug('Reading config.json file.');
 const configFile = await readFile('./config.json', 'utf8').catch(({ message }) => console.error(message));
 
 if (!configFile) {

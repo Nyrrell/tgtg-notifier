@@ -1,5 +1,4 @@
-import { getApkVersion, sleep } from './utils.js';
-import { debugReq, debugRes } from './config.js';
+import { getApkVersion, logger, sleep } from './utils.js';
 
 class TGTG_API {
   private readonly BASE_URL: string = 'https://apptoogoodtogo.com/api/';
@@ -22,22 +21,24 @@ class TGTG_API {
       this.userAgent = await this.getUserAgent();
     }
     const request = this.request(this.BASE_URL + endpoint, { headers, body });
-    debugReq('%o', request);
+    logger.req('%o', request);
 
     const res = await fetch(request);
-    debugRes(`[Status Code] ${res.status}`);
+    logger.res(`[Status Code] ${res.status}`);
 
     this.cookie = res.headers.get('set-cookie') as string;
     if (res.ok) {
       this.captchaError = 0;
       if (endpoint === ENDPOINT.AUTH_POLLING && res.status === 202) return res;
-      const json = await res.json().catch(async () => JSON.parse(await res.text()));
-      debugRes(json);
+      // Because sometimes res.json() throw an error
+      const json = JSON.parse(await res.text());
+
+      logger.res(json);
       return json;
     }
 
     if (res.status === 403) {
-      console.log('❌ Captcha Error 403');
+      logger.error('❌ Captcha Error 403');
       this.captchaError += 1;
     } else {
       throw res;
@@ -50,9 +51,9 @@ class TGTG_API {
       this.cookie = '';
     }
     if (this.captchaError >= 10) {
-      console.log('⚠️ Too many captcha Errors !', '💤 Waiting 10 minutes');
+      logger.warn('⚠️ Too many captcha Errors !', '💤 Waiting 10 minutes');
       await sleep(1000 * 60);
-      console.log('♻️ Retrying');
+      logger.info('♻️ Retrying');
       this.captchaError = 0;
     }
     await sleep(1000);

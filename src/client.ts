@@ -1,6 +1,5 @@
+import { logger, sleep } from './utils.js';
 import database from './database.js';
-import { debug } from './config.js';
-import { sleep } from './utils.js';
 import discord from './discord.js';
 import api from './api.js';
 
@@ -36,7 +35,7 @@ export class Client {
   private alreadyLogged = (): Boolean => Boolean(this.userID && this.accessToken && this.refreshToken);
 
   private refreshAccessToken = async (): Promise<Boolean> => {
-    debug(`[Refresh Token] ${this.name}`);
+    logger.debug(`[Refresh Token] ${this.name}`);
     try {
       const { access_token, refresh_token } = (await api.refreshToken(
         this.accessToken,
@@ -47,18 +46,20 @@ export class Client {
       this.refreshToken = refresh_token;
       return true;
     } catch (error) {
-      console.error('[Refresh Token]', error);
+      logger.error('[Refresh Token]', error);
       return false;
     }
   };
 
   private loginByEmail = async (): Promise<void | Boolean> => {
-    debug(`[Login By Mail] ${this.name}`);
+    logger.debug(`[Login By Mail] ${this.name}`);
     try {
       const { state, polling_id } = (await api.loginByEmail(this.email)) as TGTG_API_LOGIN;
 
       if (state === 'TERMS') {
-        console.log(`TGTG return your email "${this.email}" is not linked to an account, signup with this email first`);
+        logger.error(
+          `TGTG return your email "${this.email}" is not linked to an account, signup with this email first`
+        );
         return false;
       }
       if (state === 'WAIT') return this.startPolling(polling_id);
@@ -66,17 +67,17 @@ export class Client {
       if (error as Response) {
         const { status } = error as Response;
 
-        if (status === 429) console.error('❌ Too many requests. Try again later');
-        else console.error('[Login By Email]', error);
+        if (status === 429) logger.error('❌ Too many requests. Try again later');
+        else logger.error('[Login By Email]', error);
         return false;
       }
-      console.error('[Login By Email]', error);
+      logger.error('[Login By Email]', error);
       return false;
     }
   };
 
   private startPolling = async (pollingId: string): Promise<Boolean> => {
-    debug(`[Login Start Polling] ${this.name}`);
+    logger.debug(`[Login Start Polling] ${this.name}`);
     try {
       for (const attempt of this.maxPollingTries.keys()) {
         const { access_token, refresh_token, startup_data, status } = (await api.authPolling(
@@ -85,31 +86,31 @@ export class Client {
         )) as TGTG_API_POLLING;
         if (status === 202) {
           if (attempt === 0)
-            console.log("⚠️ Check your email to continue, don't use your mobile if TGTG App is installed !");
+            logger.warn("⚠️ Check your email to continue, don't use your mobile if TGTG App is installed !");
           await sleep(5000);
         }
         if (access_token && refresh_token) {
-          console.log(`✅ ${this.name} successfully Logged`);
+          logger.info(`✅ ${this.name} successfully Logged`);
           this.accessToken = access_token;
           this.refreshToken = refresh_token;
           this.userID = startup_data['user']['user_id'];
-          console.log(this.credentials);
+          logger.info(this.credentials);
           return true;
         }
       }
 
-      console.log('Max polling retries reached. Try again.');
+      logger.warn('Max polling retries reached. Try again.');
       return false;
     } catch (error) {
       if (error as Response) {
         const { status } = error as Response;
         if (status === 429) {
-          console.error('⚠️ Too many requests. Try again later.');
+          logger.warn('⚠️ Too many requests. Try again later.');
         } else {
-          console.error('❌ Connection failed, return this :', error);
+          logger.error('❌ Connection failed, return this :', error);
         }
       } else {
-        console.error(error);
+        logger.error(error);
       }
       return false;
     }
@@ -122,7 +123,7 @@ export class Client {
   };
 
   public getItems = async (withStock = true): Promise<void> => {
-    debug(`[Get Items] ${this.name}`);
+    logger.debug(`[Get Items] ${this.name}`);
     try {
       const { items } = (await api.getItems(this.accessToken, this.userID, withStock)) as TGTG_STORES;
 
@@ -136,17 +137,17 @@ export class Client {
         if (status === 401 && (await this.refreshAccessToken())) {
           return this.getItems();
         }
-        console.error('[Get Items]', error);
+        logger.error('[Get Items]', error);
         return;
       }
-      console.error('[Get Items]', error);
+      logger.error('[Get Items]', error);
     }
   };
 
   public login = async (): Promise<Boolean> => {
-    debug(`[Login] ${this.name}`);
+    logger.debug(`[Login] ${this.name}`);
     if (!this.email && !this.alreadyLogged()) {
-      console.log('⚠️ You must provide at least Email or User-ID, Access-Token and Refresh-Token');
+      logger.warn('⚠️ You must provide at least Email or User-ID, Access-Token and Refresh-Token');
       return false;
     }
 
@@ -155,7 +156,7 @@ export class Client {
     if (!logged) return false;
 
     const message = `🎉 Start monitoring ${this.name}`;
-    console.log(message);
+    logger.info(message);
     await this.webhook.sendMessage(message);
     return true;
   };
