@@ -20,7 +20,9 @@ class TGTG_API {
     if (!this.userAgent) {
       this.userAgent = await this.getUserAgent();
     }
-    const request = this.request(this.BASE_URL + endpoint, { headers, body });
+    const controller = new AbortController();
+    const { signal } = controller;
+    const request = this.request(endpoint, signal, { headers, body });
     logger.req('%o', request);
 
     const res = await fetch(request);
@@ -32,7 +34,7 @@ class TGTG_API {
       if (endpoint === ENDPOINT.AUTH_POLLING && res.status === 202) return res;
       // Because sometimes res.json() throw an error
       const json = JSON.parse(await res.text());
-
+      controller.abort();
       logger.res(json);
       return json;
     }
@@ -60,8 +62,8 @@ class TGTG_API {
     return this.fetch(endpoint, { headers, body });
   }
 
-  private request(url: string, { headers, body }: TGTG_API_PARAMS): Request {
-    return new Request(url, {
+  private request(endpoint: string, signal: AbortSignal, { headers, body }: TGTG_API_PARAMS): Request {
+    return new Request(this.BASE_URL + endpoint, {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -74,6 +76,7 @@ class TGTG_API {
         ...(this.cookie && { Cookie: this.cookie }),
       },
       body: JSON.stringify(body),
+      signal
     });
   }
 
