@@ -3,7 +3,7 @@ import { LOCALE, PRICE, STOCK, TIMEZONE } from './config.js';
 export default class discord {
   private readonly webhook;
   private readonly username = 'Too Good To Go';
-  private readonly avatar = 'https://cdn.jsdelivr.net/gh/Nyrrell/tgtg-notifier@master/icon.png';
+  private readonly avatar = 'https://cdn.jsdelivr.net/gh/Nyrrell/tgtg-notifier@master/media/icon.png';
 
   constructor(webhookURL: string) {
     this.webhook = new Request(webhookURL, {
@@ -61,7 +61,7 @@ export default class discord {
     return {
       color: parseInt('27ae60', 16),
       title: store['display_name'],
-      footer: { text: `📥 ${relativeTime} ${dateTime}` },
+      footer: { text: `📤 ${relativeTime} ${dateTime}` },
       fields: [
         {
           name: STOCK,

@@ -155,7 +155,7 @@ export class Client {
 
     if (!logged) return false;
 
-    const message = `🎉 Start monitoring ${this.name}`;
+    const message = `✅ Start monitoring user : ${this.name}`;
     logger.info(message);
     await this.webhook.sendMessage(message);
     return true;
