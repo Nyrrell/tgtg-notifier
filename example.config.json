@@ -21,6 +21,8 @@
   ],
   "Timezone": "Europe/Paris",
   "Locale": "fr-FR",
-  "Available": "Disponible",
-  "Price": "Prix"
+  "Language": {
+    "Available": "Disponible",
+    "Price": "Prix"
+  }
 }
