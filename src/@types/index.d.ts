@@ -43,7 +43,7 @@ declare type TGTG_STORE = {
   items_available: number;
   item: {
     item_id: string;
-    price_including_taxes: {
+    item_price: {
       minor_units: number;
       code: string;
     };
@@ -51,5 +51,14 @@ declare type TGTG_STORE = {
   pickup_interval: {
     start: string;
     end: string;
+  };
+  pickup_location: {
+    address: {
+      address_line: string;
+    };
+    location: {
+      longitude: number;
+      latitude: number;
+    };
   };
 };

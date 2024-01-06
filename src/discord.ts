@@ -35,7 +35,7 @@ export default class discord {
     JSON.stringify(Object.assign({ username: this.username, avatar_url: this.avatar }, body));
 
   private newItemEmbedded = (store: TGTG_STORE): Object => {
-    const { minor_units, code } = store['item']['price_including_taxes'];
+    const { minor_units, code } = store['item']['item_price'];
     const price = (minor_units / 100).toLocaleString(LOCALE, {
       style: 'currency',
       currency: code,
@@ -58,9 +58,16 @@ export default class discord {
       .format(dateDiff, 'day')
       .replace(/^\w/, (c) => c.toUpperCase());
 
+    const {
+      address: { address_line },
+      location: { latitude, longitude },
+    } = store['pickup_location'];
+
     return {
       color: parseInt('27ae60', 16),
       title: store['display_name'],
+      url: `https://share.toogoodtogo.com/item/${store['item']['item_id']}`,
+      description: `[${address_line}](https://www.google.com/maps?q=${latitude},${longitude})`,
       footer: { text: `📤 ${relativeTime} ${dateTime}` },
       fields: [
         {
