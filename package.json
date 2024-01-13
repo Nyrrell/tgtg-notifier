@@ -1,7 +1,7 @@
 {
   "name": "tgtg-notifier",
-  "version": "1.1.4",
-  "description": "Too Good To Go discord notifier",
+  "version": "1.1.5",
+  "description": "Too Good To Go notifier",
   "type": "module",
   "main": "src/app.js",
   "license": "MIT",
