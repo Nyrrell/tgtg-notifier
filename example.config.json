@@ -1,28 +1,40 @@
 {
-  "Users": [
+  "accounts": [
     {
-      "Name": "User 1",
-      "Email": "user.tgtg@mail.com",
-      "User-ID": "",
-      "Access-Token": "",
-      "Refresh-Token": "",
-      "Favorite": true,
-      "Webhook": "Webhook URL, example : https://discord.com/api/webhooks/123456789/ABCDEFG123456789"
+      "email": "user.tgtg@mail.com",
+      "userId": "",
+      "accessToken": "",
+      "refreshToken": "",
+      "notifiers": [
+        {
+          "type": "discord",
+          "webhookUrl": "Webhook URL, example : https://discord.com/api/webhooks/123456789/ABCDEFG123456789"
+        },
+        {
+          "type": "gotify",
+          "apiUrl": "Gotify Api URL, example : https://gotify.net",
+          "token": "RFRNGDQmCgboyVF : On the Gotify web UI, Apps > Create Application > reveal the token",
+          "priority": 10
+        }
+      ]
     },
     {
-      "Name": "User 2",
-      "Email": "user2.tgtg@mail.com",
-      "User-ID": "",
-      "Access-Token": "",
-      "Refresh-Token": "",
-      "Favorite": true,
-      "Webhook": "Webhook URL, example : https://discord.com/api/webhooks/123456789/ABCDEFG123456789"
+      "email": "user2.tgtg@mail.com",
+      "userId": "",
+      "accessToken": "",
+      "refreshToken": "",
+      "notifiers": [
+        {
+          "type": "discord",
+          "webhookUrl": "Webhook URL, example : https://discord.com/api/webhooks/123456789/ABCDEFG123456789"
+        }
+      ]
     }
   ],
-  "Timezone": "Europe/Paris",
-  "Locale": "fr-FR",
-  "Language": {
-    "Available": "Disponible",
-    "Price": "Prix"
+  "timezone": "Europe/Paris",
+  "locale": "fr-FR",
+  "language": {
+    "available": "Disponible",
+    "price": "Prix"
   }
 }

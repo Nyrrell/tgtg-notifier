@@ -1,26 +1,34 @@
-import { logger, sleep } from './utils.js';
+import { NotificationType, NotifierService, NotifierType } from './notifiers/notifierService.js';
+import { DiscordConfig, GotifyConfig } from './notifiers/config/index.js';
+import { Discord, Gotify } from './notifiers/index.js';
+import { logger, sleep, TEST_ITEM } from './utils.js';
+import { LOCALE, TIMEZONE } from './config.js';
 import database from './database.js';
-import discord from './discord.js';
 import api from './api.js';
 
 export class Client {
-  private readonly name: string;
   private readonly email: string;
   private userID: string;
-  private webhook: discord;
   private accessToken: string;
   private refreshToken: string;
-  private favorite: boolean = true;
+  private readonly notifiers: Array<NotifierService>;
   private readonly maxPollingTries: Array<number> = new Array(24);
 
-  constructor(user: User) {
-    this.name = user['Name'];
-    this.email = user['Email'];
-    this.userID = user['User-ID'];
-    this.favorite = user['Favorite'];
-    this.accessToken = user['Access-Token'];
-    this.refreshToken = user['Refresh-Token'];
-    this.webhook = new discord(user['Webhook']);
+  constructor(user: ACCOUNT) {
+    this.email = user['email'];
+    this.userID = user['userId'];
+    this.accessToken = user['accessToken'];
+    this.refreshToken = user['refreshToken'];
+    this.notifiers = user['notifiers'].map((notifier) => {
+      switch (notifier.type) {
+        case NotifierType.DISCORD:
+          return new Discord(notifier as DiscordConfig);
+        case NotifierType.GOTIFY:
+          return new Gotify(notifier as GotifyConfig);
+        default:
+          throw new Error(`Unexpected notifier config: ${notifier.type}`);
+      }
+    });
   }
 
   get credentials(): object {
@@ -35,7 +43,7 @@ export class Client {
   private alreadyLogged = (): Boolean => Boolean(this.userID && this.accessToken && this.refreshToken);
 
   private refreshAccessToken = async (): Promise<Boolean> => {
-    logger.debug(`[Refresh Token] ${this.name}`);
+    logger.debug(`[Refresh Token] ${this.email}`);
     try {
       const { access_token, refresh_token } = (await api.refreshToken(
         this.accessToken,
@@ -52,7 +60,7 @@ export class Client {
   };
 
   private loginByEmail = async (): Promise<void | Boolean> => {
-    logger.debug(`[Login By Mail] ${this.name}`);
+    logger.debug(`[Login By Mail] ${this.email}`);
     try {
       const { state, polling_id } = (await api.loginByEmail(this.email)) as TGTG_API_LOGIN;
 
@@ -77,7 +85,7 @@ export class Client {
   };
 
   private startPolling = async (pollingId: string): Promise<Boolean> => {
-    logger.debug(`[Login Start Polling] ${this.name}`);
+    logger.debug(`[Login Start Polling] ${this.email}`);
     try {
       for (const attempt of this.maxPollingTries.keys()) {
         const { access_token, refresh_token, startup_data, status } = (await api.authPolling(
@@ -90,7 +98,7 @@ export class Client {
           await sleep(5000);
         }
         if (access_token && refresh_token) {
-          logger.info(`✅ ${this.name} successfully Logged`);
+          logger.info(`✅ ${this.email} successfully Logged`);
           this.accessToken = access_token;
           this.refreshToken = refresh_token;
           this.userID = startup_data['user']['user_id'];
@@ -116,20 +124,53 @@ export class Client {
     }
   };
 
-  private compareStock = async (store: TGTG_STORE): Promise<void> => {
-    const stock = await database.get(this.name, store['item']['item_id']);
+  private compareStock = async (store: TGTG_ITEM): Promise<void> => {
+    const stock = await database.get(this.email, store['item']['item_id']);
     if ((!stock && store['items_available'] > 0) || (store['items_available'] > stock && stock === 0))
-      await this.webhook.sendNewItemsAvailable(store);
+      this.notifiers.forEach((notifier) =>
+        notifier.sendNotification(NotificationType.NEW_ITEM, this.parseStoreItem(store))
+      );
+  };
+
+  private parseStoreItem = (store: TGTG_ITEM): PARSE_TGTG_ITEM => {
+    const { minor_units, code } = store['item']['item_price'];
+    const price = (minor_units / 100).toLocaleString(LOCALE, {
+      style: 'currency',
+      currency: code,
+    });
+
+    const { start, end } = store['pickup_interval'];
+    const pickupStart = new Date(start);
+    const pickupEnd = new Date(end);
+
+    const dateTime = new Intl.DateTimeFormat(LOCALE, {
+      timeZone: TIMEZONE,
+      timeStyle: 'short',
+    }).formatRange(pickupStart, pickupEnd);
+
+    const dateDiff = Math.round((pickupStart.getTime() - Date.now()) / 1000 / 60 / 60 / 24);
+    const relativeTime = new Intl.RelativeTimeFormat(LOCALE, { numeric: 'auto' })
+      .format(dateDiff, 'day')
+      .replace(/^\w/, (c) => c.toUpperCase());
+
+    return {
+      id: store['item']['item_id'],
+      name: store['display_name'],
+      available: store['items_available'].toString(),
+      price: price,
+      pickupTime: dateTime,
+      pickupDate: relativeTime,
+    };
   };
 
   public getItems = async (withStock = true): Promise<void> => {
-    logger.debug(`[Get Items] ${this.name}`);
+    logger.debug(`[Get Items] ${this.email}`);
     try {
       const { items } = (await api.getItems(this.accessToken, this.userID, withStock)) as TGTG_STORES;
 
       for (const store of items) {
         await this.compareStock(store);
-        await database.set(this.name, store['item']['item_id'], store['items_available']);
+        await database.set(this.email, store['item']['item_id'], store['items_available']);
       }
     } catch (error) {
       if (error as Response) {
@@ -145,7 +186,7 @@ export class Client {
   };
 
   public login = async (): Promise<Boolean> => {
-    logger.debug(`[Login] ${this.name}`);
+    logger.debug(`[Login] ${this.email}`);
     if (!this.email && !this.alreadyLogged()) {
       logger.warn('⚠️ You must provide at least Email or User-ID, Access-Token and Refresh-Token');
       return false;
@@ -155,9 +196,16 @@ export class Client {
 
     if (!logged) return false;
 
-    const message = `✅ Start monitoring user : ${this.name}`;
+    const message = `Start monitoring user : ${this.email}`;
     logger.info(message);
-    await this.webhook.sendMessage(message);
+    this.notifiers.forEach((notifier) => notifier.sendNotification(NotificationType.START, message));
     return true;
+  };
+
+  public testNotifiers = async (): Promise<void> => {
+    for (const notifier of this.notifiers) {
+      logger.info(`Sending notification test to ${notifier.getType()}`);
+      await notifier.sendNotification(NotificationType.NEW_ITEM, TEST_ITEM);
+    }
   };
 }

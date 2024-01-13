@@ -1,17 +1,27 @@
 import { exit, env } from 'node:process';
 import { Cron } from 'croner';
 
+import { ACCOUNTS, TEST_NOTIFIERS } from './config.js';
 import { Client } from './client.js';
-import { USERS } from './config.js';
 import { logger } from './utils.js';
+
+export const JOB: Cron = Cron('* * * * *');
 
 const main = async (): Promise<void> => {
   const clientsToMonitor: Client[] = [];
 
-  for await (const user of USERS) {
-    logger.debug(`[Init] ${user.Name}`);
-    const initClient: Client = new Client(user);
-    if (await initClient.login()) clientsToMonitor.push(initClient);
+  for await (const account of ACCOUNTS) {
+    logger.debug(`[Init] ${account.email}`);
+    const initClient: Client = new Client(account);
+
+    if (TEST_NOTIFIERS) {
+      await initClient.testNotifiers();
+      return exit(0);
+    }
+
+    if (await initClient.login()) {
+      clientsToMonitor.push(initClient);
+    }
   }
 
   if (!clientsToMonitor.length) {
@@ -19,11 +29,11 @@ const main = async (): Promise<void> => {
     return exit(1);
   }
 
-  Cron('* * * * *', async (): Promise<void> => {
+  JOB.schedule(async (): Promise<void> => {
     for (const client of clientsToMonitor) {
       await client.getItems();
     }
-  });
+  })
 };
 
 logger.info('Too Good To Go Monitor is starting in ver.', env['npm_package_version']);

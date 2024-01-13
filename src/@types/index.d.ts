@@ -1,11 +1,9 @@
-declare type User = {
-  Name: string;
-  Email: string;
-  'User-ID': string;
-  'Access-Token': string;
-  'Refresh-Token': string;
-  Favorite: boolean;
-  Webhook: string;
+declare type ACCOUNT = {
+  email: string;
+  userId: string;
+  accessToken: string;
+  refreshToken: string;
+  notifiers: Array<any>;
 };
 
 declare type TGTG_API_PARAMS = {
@@ -35,10 +33,10 @@ declare type TGTG_API_POLLING = {
 };
 
 declare type TGTG_STORES = {
-  items: TGTG_STORE[];
+  items: TGTG_ITEM[];
 };
 
-declare type TGTG_STORE = {
+declare type TGTG_ITEM = {
   display_name: string;
   items_available: number;
   item: {
@@ -61,4 +59,13 @@ declare type TGTG_STORE = {
       latitude: number;
     };
   };
+};
+
+declare type PARSE_TGTG_ITEM = {
+  id: string;
+  name: string;
+  available: string;
+  price: string;
+  pickupDate: string;
+  pickupTime: string;
 };

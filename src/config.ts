@@ -10,8 +10,9 @@ if (!configFile) {
 
 const config = JSON.parse(configFile);
 
-export const STOCK: string = config?.['Language']?.['Available'] || 'Available';
-export const PRICE: string = config?.['Language']?.['Price'] || 'Price';
-export const TIMEZONE: string = config['Timezone'] || 'UTC';
-export const LOCALE: string = config['Locale'] || 'en-US';
-export const USERS: User[] = config['Users'];
+export const STOCK: string = config?.['language']?.['available'] || 'Available';
+export const PRICE: string = config?.['language']?.['price'] || 'Price';
+export const TIMEZONE: string = config['timezone'] || 'UTC';
+export const LOCALE: string = config['locale'] || 'en-US';
+export const ACCOUNTS: ACCOUNT[] = config['accounts'];
+export const TEST_NOTIFIERS: boolean = config?.['testNotifiers'];

@@ -35,3 +35,17 @@ export const logger = {
   req: (...args: any) => debugReq(timestamp(), ...args),
   res: (...args: any) => debugRes(timestamp(), ...args),
 };
+
+export const TEST_ITEM: PARSE_TGTG_ITEM = {
+  id: '0',
+  name: 'Item name test notifier',
+  available: '10',
+  price: '3,99€',
+  pickupTime: new Intl.DateTimeFormat(LOCALE, {
+    timeZone: TIMEZONE,
+    timeStyle: 'short',
+  }).formatRange(new Date(), new Date(Date.now() + 60000 * 10)),
+  pickupDate: new Intl.RelativeTimeFormat(LOCALE, { numeric: 'auto' })
+    .format(0, 'day')
+    .replace(/^\w/, (c) => c.toUpperCase()),
+};
