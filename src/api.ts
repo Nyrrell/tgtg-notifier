@@ -1,4 +1,5 @@
 import { getApkVersion, logger, sleep } from './utils.js';
+import { JOB } from './app.js';
 
 class TGTG_API {
   private readonly BASE_URL: string = 'https://apptoogoodtogo.com/api/';
@@ -54,9 +55,11 @@ class TGTG_API {
     }
     if (this.captchaError >= 10) {
       logger.warn('⚠️ Too many captcha Errors !', '💤 Waiting 10 minutes');
+      JOB.pause();
       await sleep(1000 * 60);
       logger.info('♻️ Retrying');
       this.captchaError = 0;
+      JOB.resume();
     }
     await sleep(1000);
     return this.fetch(endpoint, { headers, body });
@@ -76,7 +79,7 @@ class TGTG_API {
         ...(this.cookie && { Cookie: this.cookie }),
       },
       body: JSON.stringify(body),
-      signal
+      signal,
     });
   }
 
