@@ -15,7 +15,7 @@ const main = async (): Promise<void> => {
     const initClient: Client = new Client(account);
 
     if (TEST_NOTIFIERS) {
-      logger.info(`Account ${account.email} test notifiers.`)
+      logger.info(`Account ${account.email} test notifiers.`);
       await initClient.testNotifiers();
       return exit(0);
     }
@@ -23,7 +23,7 @@ const main = async (): Promise<void> => {
     if (await initClient.login()) {
       clientsToMonitor.push(initClient);
     } else {
-      logger.warn(`Failed to login account : ${account.email}`)
+      logger.warn(`Failed to login account : ${account.email}`);
     }
   }
 
@@ -36,7 +36,7 @@ const main = async (): Promise<void> => {
     for (const client of clientsToMonitor) {
       await client.getItems();
     }
-  })
+  });
 };
 
 logger.info('Too Good To Go Monitor is starting in ver.', env['npm_package_version']);

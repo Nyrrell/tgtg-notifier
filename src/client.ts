@@ -1,6 +1,6 @@
 import { NotificationType, NotifierService, NotifierType } from './notifiers/notifierService.js';
-import { DiscordConfig, GotifyConfig } from './notifiers/config/index.js';
-import { Discord, Gotify } from './notifiers/index.js';
+import { DiscordConfig, GotifyConfig, SignalConfig } from './notifiers/config/index.js';
+import { Discord, Gotify, Signal } from './notifiers/index.js';
 import { logger, sleep, TEST_ITEM } from './utils.js';
 import { LOCALE, TIMEZONE } from './config.js';
 import database from './database.js';
@@ -25,6 +25,8 @@ export class Client {
           return new Discord(notifier as DiscordConfig);
         case NotifierType.GOTIFY:
           return new Gotify(notifier as GotifyConfig);
+        case NotifierType.SIGNAL:
+          return new Signal(notifier as SignalConfig);
         default:
           throw new Error(`Unexpected notifier config: ${notifier.type}`);
       }
@@ -99,7 +101,9 @@ export class Client {
         )) as TGTG_API_POLLING;
         if (status === 202) {
           if (attempt === 0)
-            logger.warn(`⚠️ ${this.email} : Check your email to continue, don't use your mobile if TGTG App is installed !`);
+            logger.warn(
+              `⚠️ ${this.email} : Check your email to continue, don't use your mobile if TGTG App is installed !`
+            );
           await sleep(5000);
         }
         if (access_token && refresh_token) {
@@ -196,7 +200,7 @@ export class Client {
       logger.warn('⚠️ You must provide at least Email or User-ID, Access-Token and Refresh-Token');
       return false;
     }
-    logger.info(`Start login user : ${this.email}`)
+    logger.info(`Start login user : ${this.email}`);
     const logged = this.alreadyLogged() ? await this.refreshAccessToken() : await this.loginByEmail();
 
     if (!logged) return false;

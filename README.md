@@ -57,15 +57,15 @@ and `refreshToken` if you already have it).
 }
 ```
 
-### Notifiers configuration
+### Available notifiers configuration
 
 <details>
 <summary><b>DISCORD</b></summary>
 
 - <b>type</b> : _string_ = `discord`
 - <b>webhookUrl</b> : _string_ = `https://discord.com/api/webhooks/123456789/ABCDEFG123456789`
+  - [How to create a webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks)
 </details>
-
 <details>
 <summary><b>GOTIFY</b></summary>
 
@@ -75,6 +75,19 @@ and `refreshToken` if you already have it).
   - On the Gotify web UI, Apps > Create Application > reveal the token  
 - <b>priority</b>? : _number_ = `10`
   - The priority level sent with the message (Default 5)
+</details>
+<details>
+<summary><b>SIGNAL-CLI-REST-API</b></summary>
+
+- <b>type</b> : _string_ = `signal`
+- <b>apiUrl</b> : _string_ = `http://127.0.0.1:8080`
+- <b>number</b> : _string_ = `+431212131491291`
+  - Registered Phone Number
+- <b>recipients</b> : _array\<string\>_ = `["group.ckRzaEd4VmRzNnJaASAEsasa", "+4912812812121"]`
+  - Accept group-id and phone number
+
+>Tested with [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api) but [python-signal-cli-rest-api](https://gitlab.com/morph027/python-signal-cli-rest-api/) will work too, project documentation say :  
+>_It is quite similar to bbernhard/signal-cli-rest-api, [...] i’m tempted to mimic bbernhard’s API routes as close as possible._
 </details>
 
 In global configuration you can set `testNotifiers` to `true`, the process will send test notifications with a fake item for all configured accounts then exit process. 
@@ -102,4 +115,9 @@ store's stock is add.
 <summary><b>GOTIFY</b></summary>
 
 ![notif](media/notifiers/gotify.png)
+</details>
+<details>
+<summary><b>SIGNAL-CLI-REST-API</b></summary>
+
+![notif](media/notifiers/signal.png)
 </details>

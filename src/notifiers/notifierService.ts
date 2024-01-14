@@ -13,6 +13,7 @@ export abstract class NotifierService {
 export enum NotifierType {
   DISCORD = 'discord',
   GOTIFY = 'gotify',
+  SIGNAL = 'signal',
 }
 
 export enum NotificationType {
