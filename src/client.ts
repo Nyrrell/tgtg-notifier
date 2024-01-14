@@ -43,7 +43,7 @@ export class Client {
   private alreadyLogged = (): Boolean => Boolean(this.userID && this.accessToken && this.refreshToken);
 
   private refreshAccessToken = async (): Promise<Boolean> => {
-    logger.debug(`[Refresh Token] ${this.email}`);
+    logger.debug('[Refresh Token]', this.email);
     try {
       const { access_token, refresh_token } = (await api.refreshToken(
         this.accessToken,
@@ -54,13 +54,18 @@ export class Client {
       this.refreshToken = refresh_token;
       return true;
     } catch (error) {
-      logger.error('[Refresh Token]', error);
+      if (error as Response) {
+        const response = error as Response;
+        logger.error('[Refresh Token]', this.email, await response.text());
+        return false;
+      }
+      logger.error('[Refresh Token]', this.email, error);
       return false;
     }
   };
 
   private loginByEmail = async (): Promise<void | Boolean> => {
-    logger.debug(`[Login By Mail] ${this.email}`);
+    logger.debug('[Login By Mail]', this.email);
     try {
       const { state, polling_id } = (await api.loginByEmail(this.email)) as TGTG_API_LOGIN;
 
@@ -76,16 +81,16 @@ export class Client {
         const { status } = error as Response;
 
         if (status === 429) logger.error('❌ Too many requests. Try again later');
-        else logger.error('[Login By Email]', error);
+        else logger.error('[Login By Email]', this.email, error);
         return false;
       }
-      logger.error('[Login By Email]', error);
+      logger.error('[Login By Email]', this.email, error);
       return false;
     }
   };
 
   private startPolling = async (pollingId: string): Promise<Boolean> => {
-    logger.debug(`[Login Start Polling] ${this.email}`);
+    logger.debug('[Login Start Polling]', this.email);
     try {
       for (const attempt of this.maxPollingTries.keys()) {
         const { access_token, refresh_token, startup_data, status } = (await api.authPolling(
@@ -94,7 +99,7 @@ export class Client {
         )) as TGTG_API_POLLING;
         if (status === 202) {
           if (attempt === 0)
-            logger.warn("⚠️ Check your email to continue, don't use your mobile if TGTG App is installed !");
+            logger.warn(`⚠️ ${this.email} : Check your email to continue, don't use your mobile if TGTG App is installed !`);
           await sleep(5000);
         }
         if (access_token && refresh_token) {
@@ -113,9 +118,9 @@ export class Client {
       if (error as Response) {
         const { status } = error as Response;
         if (status === 429) {
-          logger.warn('⚠️ Too many requests. Try again later.');
+          logger.warn(`⚠️ ${this.email} : Too many requests. Try again later.`);
         } else {
-          logger.error('❌ Connection failed, return this :', error);
+          logger.error(`❌ ${this.email} : Connection failed, return this :`, error);
         }
       } else {
         logger.error(error);
@@ -164,7 +169,7 @@ export class Client {
   };
 
   public getItems = async (withStock = true): Promise<void> => {
-    logger.debug(`[Get Items] ${this.email}`);
+    logger.debug('[Get Items]', this.email);
     try {
       const { items } = (await api.getItems(this.accessToken, this.userID, withStock)) as TGTG_STORES;
 
@@ -178,10 +183,10 @@ export class Client {
         if (status === 401 && (await this.refreshAccessToken())) {
           return this.getItems();
         }
-        logger.error('[Get Items]', error);
+        logger.error('[Get Items]', this.email, error);
         return;
       }
-      logger.error('[Get Items]', error);
+      logger.error('[Get Items]', this.email, error);
     }
   };
 
@@ -191,7 +196,7 @@ export class Client {
       logger.warn('⚠️ You must provide at least Email or User-ID, Access-Token and Refresh-Token');
       return false;
     }
-
+    logger.info(`Start login user : ${this.email}`)
     const logged = this.alreadyLogged() ? await this.refreshAccessToken() : await this.loginByEmail();
 
     if (!logged) return false;
