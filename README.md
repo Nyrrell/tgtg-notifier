@@ -14,7 +14,8 @@ npm run build
 ```
 
 ## Configure
-> ⚠️  Be cautious if you are already using **Too Good To Go - Notifier**.  
+> [!WARNING]
+> Be cautious if you are already using **Too Good To Go - Notifier**.  
 > The latest release has caused significant changes in configuration file.
 
 To run this project, you will need to create a `config.json` file, see below or use `example.config.json` to set your
@@ -58,6 +59,8 @@ and `refreshToken` if you already have it).
 ```
 
 ### Available notifiers configuration
+> [!TIP]
+> In global configuration you can set `testNotifiers` to `true`, the process will send test notifications with a fake item for all configured accounts then exit process.
 
 <details>
 <summary><b>DISCORD</b></summary>
@@ -89,8 +92,6 @@ and `refreshToken` if you already have it).
 >Tested with [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api) but [python-signal-cli-rest-api](https://gitlab.com/morph027/python-signal-cli-rest-api/) will work too, project documentation say :  
 >_It is quite similar to bbernhard/signal-cli-rest-api, [...] i’m tempted to mimic bbernhard’s API routes as close as possible._
 </details>
-
-In global configuration you can set `testNotifiers` to `true`, the process will send test notifications with a fake item for all configured accounts then exit process. 
 
 ## Run
 
