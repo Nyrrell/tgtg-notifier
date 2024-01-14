@@ -33,12 +33,12 @@ export class Client {
     });
   }
 
-  get credentials(): object {
+  get credentials() {
     return {
-      Email: this.email || 'No email provide',
-      'User-ID': this.userID,
-      'Access-Token': this.accessToken,
-      'Refresh-Token': this.refreshToken,
+      email: this.email,
+      userId: this.userID,
+      accessToken: this.accessToken,
+      refreshToken: this.refreshToken,
     };
   }
 
@@ -102,15 +102,16 @@ export class Client {
         if (status === 202) {
           if (attempt === 0)
             logger.warn(
-              `⚠️ ${this.email} : Check your email to continue, don't use your mobile if TGTG App is installed !`
+              `⚠️ Check your email to continue, don't use your mobile if TGTG App is installed !`
             );
           await sleep(5000);
         }
         if (access_token && refresh_token) {
-          logger.info(`✅ ${this.email} successfully Logged`);
+          logger.info(`✅ successfully Logged`);
           this.accessToken = access_token;
           this.refreshToken = refresh_token;
           this.userID = startup_data['user']['user_id'];
+          logger.info("Printing account credentials");
           logger.info(this.credentials);
           return true;
         }
@@ -122,9 +123,9 @@ export class Client {
       if (error as Response) {
         const { status } = error as Response;
         if (status === 429) {
-          logger.warn(`⚠️ ${this.email} : Too many requests. Try again later.`);
+          logger.warn(`⚠️ Too many requests. Try again later.`);
         } else {
-          logger.error(`❌ ${this.email} : Connection failed, return this :`, error);
+          logger.error(`❌ Connection failed, return this :`, error);
         }
       } else {
         logger.error(error);
@@ -200,12 +201,12 @@ export class Client {
       logger.warn('⚠️ You must provide at least Email or User-ID, Access-Token and Refresh-Token');
       return false;
     }
-    logger.info(`Start login user : ${this.email}`);
+    logger.info(`Login account : ${this.email}`);
     const logged = this.alreadyLogged() ? await this.refreshAccessToken() : await this.loginByEmail();
 
     if (!logged) return false;
 
-    const message = `Start monitoring user : ${this.email}`;
+    const message = `Start monitoring account : ${this.email}`;
     logger.info(message);
     this.notifiers.forEach((notifier) => notifier.sendNotification(NotificationType.START, message));
     return true;
