@@ -2,9 +2,9 @@ import { NotifierType } from '../notifierService.js';
 import { NotifierConfig } from './notifierConfig.js';
 
 export class GotifyConfig extends NotifierConfig {
-  apiUrl: string;
-  token: string;
-  priority = 5;
+  readonly apiUrl: string;
+  readonly token: string;
+  readonly priority = 5;
 
   constructor(config: GotifyConfig) {
     super(NotifierType.GOTIFY);

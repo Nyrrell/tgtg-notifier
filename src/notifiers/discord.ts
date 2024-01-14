@@ -25,11 +25,17 @@ export class Discord extends NotifierService {
     }
   }
 
+  private getDefaultBody() {
+    return {
+      username: this.config.username,
+      avatar_url: this.config.avatar,
+    };
+  }
+
   private async sendItem(item: PARSE_TGTG_ITEM): Promise<void> {
     await fetch(this.request, {
       body: this.jsonPayload({
-        username: this.config.username,
-        avatar_url: this.config.avatar,
+        ...this.getDefaultBody(),
         embeds: [
           {
             color: parseInt('27ae60', 16),
@@ -53,8 +59,7 @@ export class Discord extends NotifierService {
   private async sendInfo(message: string): Promise<void> {
     await fetch(this.request, {
       body: this.jsonPayload({
-        username: this.config.username,
-        avatar_url: this.config.avatar,
+        ...this.getDefaultBody(),
         embeds: [
           {
             color: parseInt('2980b9', 16),

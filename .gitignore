@@ -22,6 +22,7 @@ node_modules/
 /.fleet/
 /database.sqlite
 /config.json
+/configNotifiers.json
 /itemExample.json
 /dist/
 /debug
