@@ -1,4 +1,4 @@
-import { NotificationType, NotifierService } from './notifierService.js';
+import { NotifierService } from './notifierService.js';
 import { DiscordConfig } from './config/index.js';
 import { PRICE, STOCK } from '../config.js';
 import { logger } from '../utils.js';
@@ -16,26 +16,17 @@ export class Discord extends NotifierService {
     });
   }
 
-  sendNotification(type: NotificationType, data: string | PARSE_TGTG_ITEM): Promise<void> {
-    switch (type) {
-      case NotificationType.START:
-        return this.sendInfo(data as string);
-      case NotificationType.NEW_ITEM:
-        return this.sendItem(data as PARSE_TGTG_ITEM);
-    }
-  }
-
-  private getDefaultBody() {
+  private getDefaultPayload() {
     return {
       username: this.config.username,
       avatar_url: this.config.avatar,
     };
   }
 
-  private async sendItem(item: PARSE_TGTG_ITEM): Promise<void> {
+  protected async sendItem(item: PARSE_TGTG_ITEM): Promise<void> {
     await fetch(this.request, {
       body: this.jsonPayload({
-        ...this.getDefaultBody(),
+        ...this.getDefaultPayload(),
         embeds: [
           {
             color: parseInt('27ae60', 16),
@@ -56,10 +47,10 @@ export class Discord extends NotifierService {
     }).catch((reason) => logger.error(reason));
   }
 
-  private async sendInfo(message: string): Promise<void> {
+  protected async sendInfo(message: string): Promise<void> {
     await fetch(this.request, {
       body: this.jsonPayload({
-        ...this.getDefaultBody(),
+        ...this.getDefaultPayload(),
         embeds: [
           {
             color: parseInt('2980b9', 16),
