@@ -96,13 +96,13 @@ and `refreshToken` if you already have it).
 <summary><b>TELEGRAM</b></summary>
 
 - <b>type</b> : _string_ = `telegram`
-- <b>apiUrl</b> : _string_ = `https://api.telegram.org`
-  - Just in case url api is moved
+- <b>apiUrl</b>? : _string_ = `https://api.telegram.org`
+  - Just in case url api is moved (optional)
 - <b>token</b> : _string_ = `110201543:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw`
   - [How to create a bot and get your token](https://core.telegram.org/bots/features#botfather)
 - <b>chatId</b> : _string_ | _number_ = `-100123456789`
   - Unique identifier for the target chat or username of the target channel
-- **messageThreadId**?: _number_ = `6`
+- **messageThreadId**? : _number_ = `6`
   - Unique identifier for the target message thread (topic) of the forum (optional)
 </details>
 

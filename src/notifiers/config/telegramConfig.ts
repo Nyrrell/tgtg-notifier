@@ -9,7 +9,7 @@ export class TelegramConfig extends NotifierConfig {
 
   constructor(config: TelegramConfig) {
     super(NotifierType.TELEGRAM);
-    this.apiUrl = config.apiUrl;
+    this.apiUrl = config?.apiUrl || 'https://api.telegram.org';
     this.token = config.token;
     this.chatId = config.chatId;
     this.messageThreadId = config?.messageThreadId;
