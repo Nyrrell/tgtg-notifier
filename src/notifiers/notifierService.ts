@@ -26,6 +26,7 @@ export enum NotifierType {
   DISCORD = 'discord',
   GOTIFY = 'gotify',
   SIGNAL = 'signal',
+  TELEGRAM = 'telegram',
 }
 
 export enum NotificationType {

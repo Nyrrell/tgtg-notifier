@@ -1,6 +1,6 @@
+import { DiscordConfig, GotifyConfig, SignalConfig, TelegramConfig } from './notifiers/config/index.js';
 import { NotificationType, NotifierService, NotifierType } from './notifiers/notifierService.js';
-import { DiscordConfig, GotifyConfig, SignalConfig } from './notifiers/config/index.js';
-import { Discord, Gotify, Signal } from './notifiers/index.js';
+import { Discord, Gotify, Signal, Telegram } from './notifiers/index.js';
 import { logger, sleep, TEST_ITEM } from './utils.js';
 import { LOCALE, TIMEZONE } from './config.js';
 import database from './database.js';
@@ -27,6 +27,8 @@ export class Client {
           return new Gotify(notifier as GotifyConfig);
         case NotifierType.SIGNAL:
           return new Signal(notifier as SignalConfig);
+        case NotifierType.TELEGRAM:
+          return new Telegram(notifier as TelegramConfig);
         default:
           throw new Error(`Unexpected notifier config: ${notifier.type}`);
       }
@@ -101,9 +103,7 @@ export class Client {
         )) as TGTG_API_POLLING;
         if (status === 202) {
           if (attempt === 0)
-            logger.warn(
-              `⚠️ Check your email to continue, don't use your mobile if TGTG App is installed !`
-            );
+            logger.warn(`⚠️ Check your email to continue, don't use your mobile if TGTG App is installed !`);
           await sleep(5000);
         }
         if (access_token && refresh_token) {
@@ -111,7 +111,7 @@ export class Client {
           this.accessToken = access_token;
           this.refreshToken = refresh_token;
           this.userID = startup_data['user']['user_id'];
-          logger.info("Printing account credentials");
+          logger.info('Printing account credentials');
           logger.info(this.credentials);
           return true;
         }
