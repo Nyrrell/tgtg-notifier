@@ -41,8 +41,8 @@ class TGTG_API {
     }
 
     if (res.status === 403) {
-      logger.error('❌ Captcha Error 403');
-      this.captchaError += 1;
+      this.captchaError++;
+      logger.error(`Error 403 [${this.captchaError}]`);
     } else {
       throw res;
     }
@@ -54,14 +54,14 @@ class TGTG_API {
       this.cookie = '';
     }
     if (this.captchaError >= 10) {
-      logger.warn('⚠️ Too many captcha Errors !', '💤 Waiting 10 minutes');
+      logger.warn('⚠️', 'Too many captcha Errors !', '💤', 'Sleeping 10 minutes');
       JOB.pause();
-      await sleep(1000 * 60);
-      logger.info('♻️ Retrying');
+      await sleep(1000 * 60 * 10);
+      logger.info('Retrying');
       this.captchaError = 0;
       JOB.resume();
     }
-    await sleep(1000);
+    await sleep(10000);
     return this.fetch(endpoint, { headers, body });
   }
 
