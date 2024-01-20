@@ -5,13 +5,12 @@
     "strict": true,
     "module": "ES2022",
     "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
     "esModuleInterop": true,
     "moduleResolution": "Node16",
     "noImplicitAny": true,
-    "alwaysStrict": true,
-    "paths": {
-      "*": ["./src/@types"]
-    }
+    "alwaysStrict": true
   },
-  "include": ["./src/**/*"]
+  "include": ["./src/**/*"],
+  "files": ["src/@types/index.d.ts"]
 }

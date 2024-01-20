@@ -1,36 +1,39 @@
 {
   "name": "tgtg-notifier",
-  "version": "1.1.8",
-  "description": "Too Good To Go notifier",
+  "description": "Monitors your favorite TGTG Store for newly available items",
+  "author": "Nyrrell",
+  "version": "1.1.9",
   "type": "module",
   "main": "src/app.js",
   "license": "MIT",
   "config": {
-    "debug": "dev,res",
-    "ts_args": "--loader ts-node/esm --experimental-specifier-resolution"
+    "debug": "dev,res"
   },
   "scripts": {
-    "dev": "NODE_DEBUG=$npm_package_config_debug node $npm_package_config_ts_args node src/app.ts",
-    "dev:watch": "NODE_DEBUG=$npm_package_config_debug node --watch $npm_package_config_ts_args node src/app.ts",
-    "build": "tsc",
+    "dev": "NODE_DEBUG=$npm_package_config_debug node --loader ts-node/esm src/app.ts",
+    "dev:watch": "NODE_DEBUG=$npm_package_config_debug node --watch --loader ts-node/esm src/app.ts",
+    "build": "rimraf dist && tsc",
     "start": "node dist/app.js",
     "format": "prettier --write ./src"
   },
   "keywords": [
     "Too Good To Go",
-    "Notifier",
-    "Discord"
+    "Notifier"
   ],
-  "author": "Nyrrell",
   "devDependencies": {
     "@types/node": "^18.11.0",
     "prettier": "2.8.3",
+    "rimraf": "^5.0.5",
     "ts-node": "^10.9.1",
     "typescript": "^4.8.4"
   },
   "dependencies": {
     "@keyv/sqlite": "^3.6.2",
+    "class-validator": "^0.14.1",
     "croner": "^6.0.1",
     "keyv": "^4.5.0"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }

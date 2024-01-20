@@ -1,7 +1,7 @@
 import { NotifierService } from './notifierService.js';
 import { DiscordConfig } from './config/index.js';
+import { logger } from '../common/logger.js';
 import { PRICE, STOCK } from '../config.js';
-import { logger } from '../utils.js';
 
 export class Discord extends NotifierService {
   protected readonly request: Request;

@@ -2,8 +2,8 @@ import { exit, env } from 'node:process';
 import { Cron } from 'croner';
 
 import { ACCOUNTS, TEST_NOTIFIERS } from './config.js';
+import { logger } from './common/logger.js';
 import { Client } from './client.js';
-import { logger } from './utils.js';
 
 export const JOB: Cron = Cron('* * * * *', { protect: true });
 
@@ -11,13 +11,13 @@ const main = async (): Promise<void> => {
   const clientsToMonitor: Client[] = [];
 
   for await (const account of ACCOUNTS) {
-    logger.debug('[Init]', account.email);
+    logger.info(`Initialize account : ${account.email}`);
     const initClient: Client = new Client(account);
 
     if (TEST_NOTIFIERS) {
-      logger.info(`Account ${account.email} test notifiers.`);
+      logger.info('Testing each notifiers...');
       await initClient.testNotifiers();
-      return exit(0);
+      continue;
     }
 
     if (await initClient.login()) {
@@ -25,6 +25,11 @@ const main = async (): Promise<void> => {
     } else {
       logger.warn(`Failed to login account : ${account.email}`);
     }
+  }
+
+  if (TEST_NOTIFIERS) {
+    logger.info('Notification test complete.');
+    return exit(0);
   }
 
   if (!clientsToMonitor.length) {
@@ -40,4 +45,4 @@ const main = async (): Promise<void> => {
 };
 
 logger.info('Too Good To Go Monitor is starting in ver.', env['npm_package_version']);
-await main();
+await main().catch((reason) => logger.error(reason));

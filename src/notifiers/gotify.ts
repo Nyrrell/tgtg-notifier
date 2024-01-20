@@ -1,7 +1,7 @@
 import { NotifierService } from './notifierService.js';
 import { GotifyConfig } from './config/index.js';
+import { logger } from '../common/logger.js';
 import { PRICE, STOCK } from '../config.js';
-import { logger } from '../utils.js';
 
 export class Gotify extends NotifierService {
   protected readonly request: Request;

@@ -1,4 +1,4 @@
-import { NotifierConfig } from './config/notifierConfig.js';
+import { NotifierConfig } from './config/index.js';
 
 export abstract class NotifierService {
   protected abstract readonly request: Request;

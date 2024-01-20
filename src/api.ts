@@ -1,4 +1,5 @@
-import { getApkVersion, logger, sleep } from './utils.js';
+import { getApkVersion, sleep } from './common/utils.js';
+import { logger } from './common/logger.js';
 import { JOB } from './app.js';
 
 class TGTG_API {
@@ -102,8 +103,8 @@ class TGTG_API {
     });
   }
 
-  async refreshToken(accessToken: string, refreshToken: string): Promise<TGTG_API_REFRESH | Response> {
-    return await this.fetch(ENDPOINT.REFRESH_TOKEN, {
+  refreshToken(accessToken: string, refreshToken: string): Promise<TGTG_API_REFRESH | Response> {
+    return this.fetch(ENDPOINT.REFRESH_TOKEN, {
       headers: {
         authorization: `Bearer ${accessToken}`,
       },

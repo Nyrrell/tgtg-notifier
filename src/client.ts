@@ -1,8 +1,9 @@
-import { DiscordConfig, GotifyConfig, SignalConfig, TelegramConfig } from './notifiers/config/index.js';
+import { DiscordConfig, GotifyConfig, NotifierConfig, SignalConfig, TelegramConfig } from './notifiers/config/index.js';
 import { NotificationType, NotifierService, NotifierType } from './notifiers/notifierService.js';
 import { Discord, Gotify, Signal, Telegram } from './notifiers/index.js';
-import { logger, sleep, TEST_ITEM } from './utils.js';
+import { sleep, TEST_ITEM } from './common/utils.js';
 import { LOCALE, TIMEZONE } from './config.js';
+import { logger } from './common/logger.js';
 import database from './database.js';
 import api from './api.js';
 
@@ -19,7 +20,11 @@ export class Client {
     this.userID = user['userId'];
     this.accessToken = user['accessToken'];
     this.refreshToken = user['refreshToken'];
-    this.notifiers = user['notifiers'].map((notifier) => {
+    this.notifiers = this.setNotifiers(user['notifiers'] as Array<NotifierConfig>);
+  }
+
+  private setNotifiers(notifierConfigs: Array<NotifierConfig>) {
+    return notifierConfigs.map((notifier): NotifierService => {
       switch (notifier.type) {
         case NotifierType.DISCORD:
           return new Discord(notifier as DiscordConfig);
@@ -201,7 +206,7 @@ export class Client {
       logger.warn('⚠️ You must provide at least Email or User-ID, Access-Token and Refresh-Token');
       return false;
     }
-    logger.info(`Login account : ${this.email}`);
+    logger.debug(`Login account`);
     const logged = this.alreadyLogged() ? await this.refreshAccessToken() : await this.loginByEmail();
 
     if (!logged) return false;
@@ -214,7 +219,7 @@ export class Client {
 
   public testNotifiers = async (): Promise<void> => {
     for (const notifier of this.notifiers) {
-      logger.info(`Sending notification test to ${notifier.getType()}`);
+      logger.info(`Sending notification to ${notifier.getType()}`);
       await notifier.sendNotification(NotificationType.NEW_ITEM, TEST_ITEM);
     }
   };

@@ -19,10 +19,10 @@ node_modules/
 .env
 .env.test
 
-/.fleet/
-/database.sqlite
-/config.json
-/configNotifiers.json
-/itemExample.json
-/dist/
-/debug
+.fleet
+.idea
+dist
+debug
+database.sqlite
+config.json
+configNotifiers.json
