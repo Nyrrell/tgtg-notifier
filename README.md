@@ -80,6 +80,17 @@ and `refreshToken` if you already have it).
   - The priority level sent with the message (Default 5)
 </details>
 <details>
+<summary><b>NTFY</b></summary>
+
+- <b>type</b> : _string_ = `ntfy`
+- <b>apiUrl</b> : _string_ = `https://ntfy.sh`
+- <b>topic</b> : _string_ = `tgtg`
+- <b>token</b>? : _string_ = `tk_AgQdq7mVBoFD37zQVN29RhuMzNIz2`
+  - Optional if your server don't use it. [How to create a token](https://docs.ntfy.sh/config/#access-tokens)
+- <b>priority</b>? : _number_ = `5`
+  - The priority level sent with the message, range 1 - 5 (Default 3)
+</details>
+<details>
 <summary><b>SIGNAL-CLI-REST-API</b></summary>
 
 - <b>type</b> : _string_ = `signal`
@@ -120,23 +131,23 @@ After that `tgtg-notifier` start to monitor your favorite stores (once per minut
 store's stock is add.
 
 ### Notification example
-<details>
-<summary><b>DISCORD</b></summary>
+<details><summary><b>DISCORD</b></summary>
 
 ![notif](media/notifiers/discord.png)
 </details>
-<details>
-<summary><b>GOTIFY</b></summary>
+<details><summary><b>GOTIFY</b></summary>
 
 ![notif](media/notifiers/gotify.png)
 </details>
-<details>
-<summary><b>SIGNAL-CLI-REST-API</b></summary>
+<details><summary><b>NTFY</b></summary>
+
+![notif](media/notifiers/ntfy.png)
+</details>
+<details><summary><b>SIGNAL-CLI-REST-API</b></summary>
 
 ![notif](media/notifiers/signal.png)
 </details>
-<details>
-<summary><b>TELEGRAM</b></summary>
+<details><summary><b>TELEGRAM</b></summary>
 
 ![notif](media/notifiers/telegram.png)
 </details>

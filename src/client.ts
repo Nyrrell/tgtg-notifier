@@ -1,6 +1,13 @@
-import { DiscordConfig, GotifyConfig, NotifierConfig, SignalConfig, TelegramConfig } from './notifiers/config/index.js';
+import {
+  NotifierConfig,
+  TelegramConfig,
+  DiscordConfig,
+  GotifyConfig,
+  SignalConfig,
+  NtfyConfig,
+} from './notifiers/config/index.js';
 import { NotificationType, NotifierService, NotifierType } from './notifiers/notifierService.js';
-import { Discord, Gotify, Signal, Telegram } from './notifiers/index.js';
+import { Discord, Gotify, Ntfy, Signal, Telegram } from './notifiers/index.js';
 import { sleep, TEST_ITEM } from './common/utils.js';
 import { LOCALE, TIMEZONE } from './config.js';
 import { logger } from './common/logger.js';
@@ -34,6 +41,8 @@ export class Client {
           return new Signal(notifier as SignalConfig);
         case NotifierType.TELEGRAM:
           return new Telegram(notifier as TelegramConfig);
+        case NotifierType.NTFY:
+          return new Ntfy(notifier as NtfyConfig);
         default:
           throw new Error(`Unexpected notifier config: ${notifier.type}`);
       }
