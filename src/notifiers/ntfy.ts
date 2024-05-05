@@ -9,9 +9,20 @@ export class Ntfy extends NotifierService {
   constructor(config: NtfyConfig) {
     super();
     this.config = new NtfyConfig(config);
-    this.request = new Request(`${this.config.apiUrl}`, {
+
+    const { apiUrl, token } = this.config;
+
+    const headers = new Headers({
+      'Content-Type': 'application/json',
+    });
+
+    if (token) {
+      headers.append('authorization', `Bearer ${token}`);
+    }
+
+    this.request = new Request(`${apiUrl}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', authorization: `Bearer ${this.config.token}` },
+      headers,
     });
   }
 
