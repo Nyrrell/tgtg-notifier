@@ -26,3 +26,5 @@ debug
 database.sqlite
 config.json
 configNotifiers.json
+/http-client.private.env.json
+test_api.http

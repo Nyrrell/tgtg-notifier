@@ -7,3 +7,4 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./config.json:/usr/app/config.json
+      - ./logs/:/usr/app/logs
