@@ -9,14 +9,9 @@ I made it for my personal use only, but it may also be usefully to someone else.
 ```zsh
 git clone https://github.com/Nyrrell/tgtg-notifier.git
 cd tgtg-notifier
-npm install
-npm run build
 ```
 
 ## Configure
-> [!WARNING]
-> Be cautious if you are already using **Too Good To Go - Notifier**.  
-> The latest release has caused significant changes in configuration file.
 
 To run this project, you will need to create a `config.json` file, see below or use `example.config.json` to set your
 configuration.
@@ -54,7 +49,8 @@ and `refreshToken` if you already have it).
     "available": "Disponible",
     "price": "Prix"
   },
-  "testNotifiers": false
+  "testNotifiers": false,
+  "logLevel": "info"
 }
 ```
 
@@ -119,7 +115,11 @@ and `refreshToken` if you already have it).
 
 ## Run
 
+First you need to install [Node.js](https://nodejs.org/) 18.17 or higher
+
 ```zsh
+npm install
+npm run build
 npm run start
 ```
 
@@ -129,6 +129,22 @@ Go app is installed).<br>
 
 After that `tgtg-notifier` start to monitor your favorite stores (once per minute) and send you a notification when a
 store's stock is add.
+
+## Run with docker
+
+A Dockerfile is available in the repository to build a ready-to-run Docker image.<br>
+You need to map the volumes to use your `config.json` file and a folder for the application's `logs`.
+
+```zsh
+docker build -t tgtg-notifier-app .
+docker run --name tgtg-notifier-app -d -v ./config.json:/usr/app/config.json -v ./logs/:/usr/app/logs tgtg-notifier-app
+```
+
+If you prefer to use Docker Compose, a `docker-compose.yml` configuration file is also available.
+
+```zsh
+docker-compose up -d
+```
 
 ### Notification example
 <details><summary><b>DISCORD</b></summary>
