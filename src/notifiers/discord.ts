@@ -1,6 +1,5 @@
 import { NotifierService } from './notifierService.js';
 import { DiscordConfig } from './config/index.js';
-import { logger } from '../common/logger.js';
 import { PRICE, STOCK } from '../config.js';
 
 export class Discord extends NotifierService {
@@ -23,7 +22,7 @@ export class Discord extends NotifierService {
     };
   }
 
-  protected async sendItem(item: PARSE_TGTG_ITEM): Promise<void> {
+  protected async sendItem(item: SENDABLE_ITEM): Promise<void> {
     await fetch(this.request, {
       body: this.jsonPayload({
         ...this.getDefaultPayload(),
@@ -31,7 +30,6 @@ export class Discord extends NotifierService {
           {
             color: parseInt('27ae60', 16),
             title: item.name,
-            url: `https://share.toogoodtogo.com/item/${item.id}`,
             footer: { text: `📤 ${item.pickupDate} ${item.pickupTime}` },
             fields: [
               {
@@ -44,7 +42,7 @@ export class Discord extends NotifierService {
           },
         ],
       }),
-    }).catch((reason) => logger.error(reason));
+    }).catch(this.error);
   }
 
   protected async sendInfo(message: string): Promise<void> {
@@ -58,6 +56,6 @@ export class Discord extends NotifierService {
           },
         ],
       }),
-    }).catch((reason) => logger.warn(reason));
+    }).catch(this.error);
   }
 }

@@ -36,6 +36,12 @@ declare type TGTG_STORES = {
   items: TGTG_ITEM[];
 };
 
+declare type TGTG_FAVORITES_STORES = {
+  mobile_bucket: {
+    items: TGTG_ITEM[]
+  }
+};
+
 declare type TGTG_ITEM = {
   display_name: string;
   items_available: number;
@@ -61,7 +67,7 @@ declare type TGTG_ITEM = {
   };
 };
 
-declare type PARSE_TGTG_ITEM = {
+declare type SENDABLE_ITEM = {
   id: string;
   name: string;
   available: string;

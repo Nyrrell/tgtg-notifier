@@ -21,7 +21,7 @@ export const getApkVersion = async (): Promise<string> => {
   return apkVersion ? apkVersion : defaultApkVersion;
 };
 
-export const TEST_ITEM: PARSE_TGTG_ITEM = {
+export const TEST_ITEM: SENDABLE_ITEM = {
   id: '0',
   name: 'Item name test notifier',
   available: '10',

@@ -1,3 +1,5 @@
+import { Logger } from 'winston';
+
 import { NotifierConfig } from './config/index.js';
 import { logger } from '../common/logger.js';
 
@@ -5,12 +7,12 @@ export abstract class NotifierService {
   protected abstract readonly request: Request;
   protected abstract readonly config: NotifierConfig;
 
-  public sendNotification(type: NotificationType, payload: string | PARSE_TGTG_ITEM): Promise<void> {
+  public sendNotification(type: NotificationType, payload: string | SENDABLE_ITEM): Promise<void> {
     switch (type) {
       case NotificationType.START:
         return this.sendInfo(payload as string);
       case NotificationType.NEW_ITEM:
-        return this.sendItem(payload as PARSE_TGTG_ITEM);
+        return this.sendItem(payload as SENDABLE_ITEM);
     }
   }
 
@@ -18,11 +20,11 @@ export abstract class NotifierService {
     if (!res.ok) throw await res.text();
   };
 
-  protected error = (reason: String): void => logger.warn(reason.trim());
+  protected error = (reason: String): Logger => logger.warn(reason);
 
   protected abstract sendInfo(payload: string): Promise<void>;
 
-  protected abstract sendItem(payload: PARSE_TGTG_ITEM): Promise<void>;
+  protected abstract sendItem(payload: SENDABLE_ITEM): Promise<void>;
 
   protected jsonPayload = (body: object): string => JSON.stringify(body);
 

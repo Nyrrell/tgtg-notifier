@@ -1,3 +1,5 @@
+import { errors } from 'undici';
+
 import {
   NotifierConfig,
   TelegramConfig,
@@ -61,67 +63,61 @@ export class Client {
   private alreadyLogged = (): Boolean => Boolean(this.userID && this.accessToken && this.refreshToken);
 
   private refreshAccessToken = async (): Promise<Boolean> => {
-    logger.debug('[Refresh Token]', this.email);
+    logger.debug(`[Refresh Token] ${this.email}`);
     try {
       const { access_token, refresh_token } = (await api.refreshToken(
         this.accessToken,
-        this.refreshToken
+        this.refreshToken,
       )) as TGTG_API_REFRESH;
 
       this.accessToken = access_token;
       this.refreshToken = refresh_token;
       return true;
     } catch (error) {
-      if (error as Response) {
-        const response = error as Response;
-        logger.error('[Refresh Token]', this.email, await response.text());
-        return false;
-      }
-      logger.error('[Refresh Token]', this.email, error);
+      logger.error(`[Refresh Token] ${this.email}`);
+      logger.error(error);
       return false;
     }
   };
 
   private loginByEmail = async (): Promise<void | Boolean> => {
-    logger.debug('[Login By Mail]', this.email);
+    logger.debug(`[Login By Mail] ${this.email}`);
     try {
       const { state, polling_id } = (await api.loginByEmail(this.email)) as TGTG_API_LOGIN;
 
       if (state === 'TERMS') {
-        logger.error(
-          `TGTG return your email "${this.email}" is not linked to an account, signup with this email first`
-        );
+        logger.error(`TGTG return your email "${this.email}" is not linked to an account, signup with this email first`);
         return false;
       }
       if (state === 'WAIT') return this.startPolling(polling_id);
     } catch (error) {
-      if (error as Response) {
-        const { status } = error as Response;
-
-        if (status === 429) logger.error('❌ Too many requests. Try again later');
-        else logger.error('[Login By Email]', this.email, error);
-        return false;
+      logger.error(`[Login By Email] ${this.email}`);
+      if (error instanceof errors.ResponseStatusCodeError) {
+        if (error.status === 429) {
+          logger.error('Too many requests. Try again later');
+        }
       }
-      logger.error('[Login By Email]', this.email, error);
+      logger.error(error);
       return false;
     }
   };
 
   private startPolling = async (pollingId: string): Promise<Boolean> => {
-    logger.debug('[Login Start Polling]', this.email);
+    logger.debug(`[Login start polling] ${this.email}`);
     try {
       for (const attempt of this.maxPollingTries.keys()) {
-        const { access_token, refresh_token, startup_data, status } = (await api.authPolling(
-          this.email,
-          pollingId
-        )) as TGTG_API_POLLING;
+        const {
+          access_token,
+          refresh_token,
+          startup_data,
+          status,
+        } = await api.authPolling(this.email, pollingId) as TGTG_API_POLLING;
         if (status === 202) {
-          if (attempt === 0)
-            logger.warn(`⚠️ Check your email to continue, don't use your mobile if TGTG App is installed !`);
+          if (attempt === 0) logger.warn('Check your email to continue, don\'t use your mobile if TGTG App is installed !');
           await sleep(5000);
         }
         if (access_token && refresh_token) {
-          logger.info(`✅ successfully Logged`);
+          logger.info(`Successfully Logged`);
           this.accessToken = access_token;
           this.refreshToken = refresh_token;
           this.userID = startup_data['user']['user_id'];
@@ -134,29 +130,27 @@ export class Client {
       logger.warn('Max polling retries reached. Try again.');
       return false;
     } catch (error) {
-      if (error as Response) {
-        const { status } = error as Response;
-        if (status === 429) {
-          logger.warn(`⚠️ Too many requests. Try again later.`);
-        } else {
-          logger.error(`❌ Connection failed, return this :`, error);
-        }
-      } else {
-        logger.error(error);
+      if (error instanceof errors.ResponseStatusCodeError && error.status === 429) {
+        logger.warn('Too many requests. Try again later.');
+        return false;
       }
+
+      logger.error(error);
       return false;
     }
   };
 
   private compareStock = async (store: TGTG_ITEM): Promise<void> => {
     const stock = await database.get(this.email, store['item']['item_id']);
-    if ((!stock && store['items_available'] > 0) || (store['items_available'] > stock && stock === 0))
+    if ((!stock && store['items_available'] > 0) || (store['items_available'] > stock && stock === 0)) {
+      logger.debug('New item available (%s) for store %s', store.items_available, store.display_name);
       this.notifiers.forEach((notifier) =>
-        notifier.sendNotification(NotificationType.NEW_ITEM, this.parseStoreItem(store))
+        notifier.sendNotification(NotificationType.NEW_ITEM, this.parseStoreItem(store)),
       );
+    }
   };
 
-  private parseStoreItem = (store: TGTG_ITEM): PARSE_TGTG_ITEM => {
+  private parseStoreItem = (store: TGTG_ITEM): SENDABLE_ITEM => {
     const { minor_units, code } = store['item']['item_price'];
     const price = (minor_units / 100).toLocaleString(LOCALE, {
       style: 'currency',
@@ -188,31 +182,29 @@ export class Client {
   };
 
   public getItems = async (withStock = true): Promise<void> => {
-    logger.debug('[Get Items]', this.email);
+    logger.debug(`[Get Items] ${this.email}`);
     try {
-      const { items } = (await api.getItems(this.accessToken, this.userID, withStock)) as TGTG_STORES;
+      const { items } = await api.getItems(this.accessToken, this.userID, withStock) as TGTG_STORES;
 
       for (const store of items) {
         await this.compareStock(store);
         await database.set(this.email, store['item']['item_id'], store['items_available']);
       }
     } catch (error) {
-      if (error as Response) {
-        const { status } = error as Response;
-        if (status === 401 && (await this.refreshAccessToken())) {
+      logger.error(`[Get Items] ${this.email}`);
+      if (error instanceof errors.ResponseStatusCodeError) {
+        if (error.status === 401 && (await this.refreshAccessToken())) {
           return this.getItems();
         }
-        logger.error('[Get Items]', this.email, error);
-        return;
       }
-      logger.error('[Get Items]', this.email, error);
+      logger.error(error);
     }
   };
 
   public login = async (): Promise<Boolean> => {
     logger.debug(`[Login] ${this.email}`);
     if (!this.email && !this.alreadyLogged()) {
-      logger.warn('⚠️ You must provide at least Email or User-ID, Access-Token and Refresh-Token');
+      logger.warn('You must provide at least Email or User-ID, Access-Token and Refresh-Token');
       return false;
     }
     logger.debug(`Login account`);

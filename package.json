@@ -2,16 +2,13 @@
   "name": "tgtg-notifier",
   "description": "Monitors your favorite TGTG Store for newly available items",
   "author": "Nyrrell",
-  "version": "1.1.11",
+  "version": "1.1.12",
   "type": "module",
   "main": "src/app.js",
   "license": "MIT",
-  "config": {
-    "debug": "dev,res"
-  },
   "scripts": {
-    "dev": "NODE_DEBUG=$npm_package_config_debug node --loader ts-node/esm src/app.ts",
-    "dev:watch": "NODE_DEBUG=$npm_package_config_debug node --watch --loader ts-node/esm src/app.ts",
+    "dev": "node --loader ts-node/esm src/app.ts",
+    "dev:watch": "node --watch --loader ts-node/esm src/app.ts",
     "build": "rimraf dist && tsc",
     "start": "node dist/app.js",
     "format": "prettier --write ./src"
@@ -31,9 +28,12 @@
     "@keyv/sqlite": "^3.6.2",
     "class-validator": "^0.14.1",
     "croner": "^6.0.1",
-    "keyv": "^4.5.0"
+    "keyv": "^4.5.0",
+    "undici": "^6.19.7",
+    "winston": "^3.14.2",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=18.17"
   }
 }

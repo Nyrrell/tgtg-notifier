@@ -1,6 +1,5 @@
 import { NotifierService } from './notifierService.js';
 import { TelegramConfig } from './config/index.js';
-import { logger } from '../common/logger.js';
 import { PRICE, STOCK } from '../config.js';
 
 export class Telegram extends NotifierService {
@@ -29,10 +28,10 @@ export class Telegram extends NotifierService {
         ...this.getDefaultPayload(),
         text: message,
       }),
-    }).catch((reason) => logger.warn(reason));
+    }).catch(this.error);
   }
 
-  protected async sendItem(item: PARSE_TGTG_ITEM): Promise<void> {
+  protected async sendItem(item: SENDABLE_ITEM): Promise<void> {
     await fetch(this.request, {
       body: this.jsonPayload({
         ...this.getDefaultPayload(),
@@ -45,6 +44,6 @@ export class Telegram extends NotifierService {
           is_disabled: true,
         },
       }),
-    }).catch((reason) => logger.warn(reason));
+    }).catch(this.error);
   }
 }

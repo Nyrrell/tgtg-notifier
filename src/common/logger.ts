@@ -1,16 +1,39 @@
-import { debuglog } from 'node:util';
+import { Logger, format, transports, createLogger } from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
 
-import { LOCALE, TIMEZONE } from '../config.js';
+import { LOG_LEVEL } from '../config.js';
 
-const timestamp = () => `[${new Date().toLocaleString(LOCALE, { timeZone: TIMEZONE })}]`.replaceAll('/', '-');
-const debug = debuglog('dev');
-const debugReq = debuglog('req');
-const debugRes = debuglog('res');
-export const logger = {
-  info: (...args: any) => console.info(timestamp(), '\x1b[34mINFO\x1b[0m:', ...args),
-  error: (...args: any) => console.error(timestamp(), '\x1b[31mERROR\x1b[0m:', ...args),
-  warn: (...args: any) => console.warn(timestamp(), '\x1b[33mWARN\x1b[0m:', ...args),
-  debug: (...args: any) => debug(timestamp(), ...args),
-  req: (...args: any) => debugReq(timestamp(), ...args),
-  res: (...args: any) => debugRes(timestamp(), ...args),
-};
+const transportConsole: transports.ConsoleTransportInstance = new transports.Console({
+  format: format.colorize({
+    all: true,
+  }),
+});
+
+const transportFile: DailyRotateFile = new DailyRotateFile({
+  filename: 'logs/app-%DATE%.log',
+  datePattern: 'YYYY-MM-DD',
+  maxSize: '20m',
+  maxFiles: '7d',
+});
+
+export const logger: Logger = createLogger({
+  level: LOG_LEVEL,
+  format: format.combine(
+    format.splat(),
+    format.timestamp({
+      format: 'YYYY-MM-DD HH:mm:ss',
+    }),
+    format.errors({ stack: true }),
+    format.printf(({ timestamp, level, message, stack }) => {
+      let log = `[${timestamp}] ${level.toUpperCase()}: ${message}`;
+      if (stack) {
+        log += `\n ${stack}`;
+      }
+      return log;
+    }),
+  ),
+  transports: [
+    transportConsole,
+    transportFile,
+  ],
+});

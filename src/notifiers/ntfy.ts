@@ -44,7 +44,7 @@ export class Ntfy extends NotifierService {
       .catch(this.error);
   }
 
-  protected async sendItem(item: PARSE_TGTG_ITEM): Promise<void> {
+  protected async sendItem(item: SENDABLE_ITEM): Promise<void> {
     await fetch(this.request, {
       body: this.jsonPayload({
         ...this.getDefaultPayload(),

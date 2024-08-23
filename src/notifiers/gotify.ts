@@ -1,6 +1,5 @@
 import { NotifierService } from './notifierService.js';
 import { GotifyConfig } from './config/index.js';
-import { logger } from '../common/logger.js';
 import { PRICE, STOCK } from '../config.js';
 
 export class Gotify extends NotifierService {
@@ -21,10 +20,10 @@ export class Gotify extends NotifierService {
       body: this.jsonPayload({
         message: message,
       }),
-    }).catch((reason) => logger.warn(reason));
+    }).catch(this.error);
   }
 
-  protected async sendItem(item: PARSE_TGTG_ITEM): Promise<void> {
+  protected async sendItem(item: SENDABLE_ITEM): Promise<void> {
     await fetch(this.request, {
       body: this.jsonPayload({
         title: item.name,
@@ -36,6 +35,6 @@ export class Gotify extends NotifierService {
           'client::notification': { click: { url: `https://share.toogoodtogo.com/item/${item.id}` } },
         },
       }),
-    }).catch((reason) => logger.warn(reason));
+    }).catch(this.error);
   }
 }

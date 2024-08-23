@@ -44,5 +44,5 @@ const main = async (): Promise<void> => {
   });
 };
 
-logger.info('Too Good To Go Monitor is starting in ver.', env['npm_package_version']);
+logger.info(`Too Good To Go Monitor is starting in ver. ${env['npm_package_version']}`);
 await main().catch((reason) => logger.error(reason));
