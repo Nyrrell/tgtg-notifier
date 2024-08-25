@@ -49,6 +49,7 @@ and `refreshToken` if you already have it).
     "available": "Disponible",
     "price": "Prix"
   },
+  "cronSchedule": "*/5 6-22 * * *",
   "testNotifiers": false,
   "logLevel": "info"
 }
