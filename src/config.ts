@@ -17,4 +17,4 @@ export const LOCALE: string = config['locale'] || 'en-US';
 export const LOG_LEVEL: string = config['logLevel'] || 'info';
 export const ACCOUNTS: ACCOUNT[] = config['accounts'];
 export const TEST_NOTIFIERS: boolean = config?.['testNotifiers'];
-export const SEND_START_NOTIFICATION: string = config?.['sendStartNotification'] || true;
+export const SEND_START_NOTIFICATION: string = config?.['sendStartNotification'] ?? true;
