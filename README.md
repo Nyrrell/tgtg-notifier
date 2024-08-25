@@ -50,6 +50,7 @@ and `refreshToken` if you already have it).
     "price": "Prix"
   },
   "cronSchedule": "*/5 6-22 * * *",
+  "sendStartNotification": true,
   "testNotifiers": false,
   "logLevel": "info"
 }
