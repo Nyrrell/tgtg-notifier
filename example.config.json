@@ -36,6 +36,5 @@
   "language": {
     "available": "Disponible",
     "price": "Prix"
-  },
-  "sendStartNotification": true
+  }
 }
