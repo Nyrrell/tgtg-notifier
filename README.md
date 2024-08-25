@@ -49,6 +49,7 @@ and `refreshToken` if you already have it).
     "available": "Disponible",
     "price": "Prix"
   },
+  "sendStartNotification": true,
   "testNotifiers": false,
   "logLevel": "info"
 }

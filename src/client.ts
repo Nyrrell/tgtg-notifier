@@ -11,7 +11,7 @@ import {
 import { NotificationType, NotifierService, NotifierType } from './notifiers/notifierService.js';
 import { Discord, Gotify, Ntfy, Signal, Telegram } from './notifiers/index.js';
 import { sleep, TEST_ITEM } from './common/utils.js';
-import { LOCALE, TIMEZONE } from './config.js';
+import { LOCALE, SEND_START_NOTIFICATION, TIMEZONE } from './config.js';
 import { logger } from './common/logger.js';
 import database from './database.js';
 import api from './api.js';
@@ -214,7 +214,11 @@ export class Client {
 
     const message = `Start monitoring account : ${this.email}`;
     logger.info(message);
-    this.notifiers.forEach((notifier) => notifier.sendNotification(NotificationType.START, message));
+
+    if (SEND_START_NOTIFICATION) {
+      this.notifiers.forEach((notifier) => notifier.sendNotification(NotificationType.START, message));
+    }
+
     return true;
   };
 
