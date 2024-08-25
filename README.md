@@ -115,6 +115,18 @@ and `refreshToken` if you already have it).
   - Unique identifier for the target message thread (topic) of the forum (optional)
 </details>
 
+### Global configuration details
+| Name                    | Default      | Description                                                                                                                     |
+|-------------------------|--------------|---------------------------------------------------------------------------------------------------------------------------------|
+| `timezone`              | `UTC`        | The time zone to use as UTC offsets                                                                                             |
+| `locale`                | `en-US`      | Used to format dates and numbers in a form that's conventional for a specific language and region                               |
+| `language.available`    | `Available`  | Translate 'Available' in your language                                                                                          |
+| `language.price`        | `Price`      | Translate 'Price' in your language                                                                                              |
+| `cronSchedule`          | `* * * * *`  | [Pattern](https://github.com/hexagon/croner?tab=readme-ov-file#pattern) used to specify monitoring execution                    |
+| `sendStartNotification` | `true`       | Send a start notification when app start to monitor an account                                                                  |
+| `testNotifiers`         | `false`      | Send a test notification with a fake item for all configured accounts then exit process                                         |
+| `logLevel`              | `info`       | Log only if level is less than or equal to this [level](https://github.com/winstonjs/winston?tab=readme-ov-file#logging-levels) |
+
 ## Run
 
 First you need to install [Node.js](https://nodejs.org/) 18.17 or higher
