@@ -1,4 +1,5 @@
 import { Dispatcher, request, errors } from 'undici';
+import * as zlib from 'node:zlib';
 
 import { getApkVersion, sleep } from './common/utils.js';
 import { logger } from './common/logger.js';
@@ -33,7 +34,17 @@ class TGTG_API {
     if (res.statusCode >= 200 && res.statusCode < 300) {
       this.captchaError = 0;
       if (endpoint === ENDPOINT.AUTH_POLLING && res.statusCode === 202) return res;
-      return await res.body.json() as T;
+
+      let data: string;
+      if (res.headers?.['content-encoding'] === 'gzip') {
+        const arrayBuffer = await res.body.arrayBuffer();
+        const bufferData = zlib.gunzipSync(arrayBuffer);
+        data = bufferData.toString()
+      } else {
+        data = await res.body.text();
+      }
+
+      return JSON.parse(data) as T;
     }
 
     if (res.statusCode === 403) {
@@ -72,6 +83,7 @@ class TGTG_API {
         'user-agent': this.userAgent,
         accept: 'application/json',
         'accept-language': 'en-GB',
+        'accept-encoding': 'gzip',
         ...(this.cookie && { Cookie: this.cookie }),
       },
       body: JSON.stringify(body),
