@@ -22,7 +22,7 @@ declare type TGTG_API_LOGIN = {
 };
 
 declare type TGTG_API_POLLING = {
-  status: number;
+  statusCode: number;
   access_token: string;
   refresh_token: string;
   startup_data: {

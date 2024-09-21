@@ -110,9 +110,9 @@ export class Client {
           access_token,
           refresh_token,
           startup_data,
-          status,
+          statusCode,
         } = await api.authPolling(this.email, pollingId) as TGTG_API_POLLING;
-        if (status === 202) {
+        if (statusCode === 202) {
           if (attempt === 0) logger.warn('Check your email to continue, don\'t use your mobile if TGTG App is installed !');
           await sleep(5000);
         }
@@ -122,7 +122,7 @@ export class Client {
           this.refreshToken = refresh_token;
           this.userID = startup_data['user']['user_id'];
           logger.info('Printing account credentials');
-          logger.info(this.credentials);
+          logger.info('%o', this.credentials);
           return true;
         }
       }

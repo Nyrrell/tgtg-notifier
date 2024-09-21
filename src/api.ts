@@ -87,7 +87,7 @@ class TGTG_API {
     });
   }
 
-  authPolling(email: string, pollingId: string) {
+  authPolling(email: string, pollingId: string): Promise<TGTG_API_POLLING | Dispatcher.ResponseData> {
     return this.fetch(ENDPOINT.AUTH_POLLING, {
       body: {
         device_type: 'ANDROID',
