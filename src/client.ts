@@ -18,7 +18,6 @@ import api from './api.js';
 
 export class Client {
   private readonly email: string;
-  private userID: string;
   private accessToken: string;
   private refreshToken: string;
   private readonly notifiers: Array<NotifierService>;
@@ -26,7 +25,6 @@ export class Client {
 
   constructor(user: ACCOUNT) {
     this.email = user['email'];
-    this.userID = user['userId'];
     this.accessToken = user['accessToken'];
     this.refreshToken = user['refreshToken'];
     this.notifiers = this.setNotifiers(user['notifiers'] as Array<NotifierConfig>);
@@ -54,13 +52,12 @@ export class Client {
   get credentials() {
     return {
       email: this.email,
-      userId: this.userID,
       accessToken: this.accessToken,
       refreshToken: this.refreshToken,
     };
   }
 
-  private alreadyLogged = (): Boolean => Boolean(this.userID && this.accessToken && this.refreshToken);
+  private alreadyLogged = (): Boolean => Boolean(this.accessToken && this.refreshToken);
 
   private refreshAccessToken = async (): Promise<Boolean> => {
     logger.debug(`[Refresh Token] ${this.email}`);
@@ -109,7 +106,6 @@ export class Client {
         const {
           access_token,
           refresh_token,
-          startup_data,
           statusCode,
         } = await api.authPolling(this.email, pollingId) as TGTG_API_POLLING;
         if (statusCode === 202) {
@@ -120,7 +116,6 @@ export class Client {
           logger.info(`Successfully Logged`);
           this.accessToken = access_token;
           this.refreshToken = refresh_token;
-          this.userID = startup_data['user']['user_id'];
           logger.info('Printing account credentials');
           logger.info('%o', this.credentials);
           return true;
@@ -184,7 +179,7 @@ export class Client {
   public getItems = async (withStock = true): Promise<void> => {
     logger.debug(`[Get Items] ${this.email}`);
     try {
-      const { items } = await api.getItems(this.accessToken, this.userID, withStock) as TGTG_STORES;
+      const { items } = await api.getItems(this.accessToken, withStock) as TGTG_STORES;
 
       for (const store of items) {
         await this.compareStock(store);

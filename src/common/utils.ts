@@ -3,7 +3,7 @@ import { LOCALE, TIMEZONE } from '../config.js';
 export const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const getApkVersion = async (): Promise<string> => {
-  const defaultApkVersion = '23.6.11';
+  const defaultApkVersion = '24.11.0';
   let apkVersion = '';
 
   const apk = await fetch('https://play.google.com/store/apps/details?id=com.app.tgtg&hl=en&gl=US').then((res) =>

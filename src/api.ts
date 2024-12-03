@@ -120,7 +120,7 @@ class TGTG_API {
     });
   }
 
-  getItems(accessToken: string, userId: string, withStock: boolean = true, favorite: boolean = true): Promise<TGTG_STORES | Dispatcher.ResponseData> {
+  getItems(accessToken: string, withStock: boolean = true, favorite: boolean = true): Promise<TGTG_STORES | Dispatcher.ResponseData> {
     return this.fetch(ENDPOINT.ITEM, {
       headers: {
         authorization: `Bearer ${accessToken}`,
@@ -133,16 +133,15 @@ class TGTG_API {
           longitude: 0.0,
         },
         radius: 20,
-        user_id: userId,
       },
     });
   }
 }
 
 enum ENDPOINT {
-  AUTH_POLLING = 'auth/v3/authByRequestPollingId',
-  REFRESH_TOKEN = 'auth/v3/token/refresh',
-  AUTH_BY_EMAIL = 'auth/v3/authByEmail',
+  AUTH_POLLING = 'auth/v5/authByRequestPollingId',
+  REFRESH_TOKEN = 'auth/v5/token/refresh',
+  AUTH_BY_EMAIL = 'auth/v5/authByEmail',
   ITEM = 'item/v8/',
 }
 

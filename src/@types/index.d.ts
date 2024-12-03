@@ -25,11 +25,6 @@ declare type TGTG_API_POLLING = {
   statusCode: number;
   access_token: string;
   refresh_token: string;
-  startup_data: {
-    user: {
-      user_id: string;
-    };
-  };
 };
 
 declare type TGTG_STORES = {

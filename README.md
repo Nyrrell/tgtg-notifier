@@ -19,7 +19,7 @@ configuration.
 
 - Set global parameters if needed `timezone` (_default:_ UTC), `locale` (_default:_ en-US)
 - To improve i18n, you can set `available` & `price` for translate in your language, it's totally optional.
-- For each account, be sure to fill these fields `notifiers` and `email` (optionally `userId`, `accessToken`
+- For each account, be sure to fill these fields `notifiers` and `email` (optionally `accessToken`
 and `refreshToken` if you already have it).  
 
 ```json
@@ -27,7 +27,6 @@ and `refreshToken` if you already have it).
   "accounts": [
     {
       "email": "Too Good To Go email",
-      "userId": "Too Good To Go User ID goes here if you have it",
       "accessToken": "Too Good To Go Access Token goes here if you have it",
       "refreshToken": "Too Good To Go Refresh Token goes here if you have it",
       "notifiers": [

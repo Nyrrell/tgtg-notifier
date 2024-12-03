@@ -2,7 +2,6 @@
   "accounts": [
     {
       "email": "user.tgtg@mail.com",
-      "userId": "",
       "accessToken": "",
       "refreshToken": "",
       "notifiers": [
@@ -20,7 +19,6 @@
     },
     {
       "email": "user2.tgtg@mail.com",
-      "userId": "",
       "accessToken": "",
       "refreshToken": "",
       "notifiers": [
