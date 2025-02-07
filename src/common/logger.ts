@@ -30,10 +30,7 @@ export const logger: Logger = createLogger({
         log += `\n ${stack}`;
       }
       return log;
-    }),
+    })
   ),
-  transports: [
-    transportConsole,
-    transportFile,
-  ],
+  transports: [transportConsole, transportFile],
 });
