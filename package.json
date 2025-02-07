@@ -39,6 +39,6 @@
     "winston-daily-rotate-file": "^5.0.0"
   },
   "engines": {
-    "node": ">=18.17"
+    "node": ">=20.18.1"
   }
 }
