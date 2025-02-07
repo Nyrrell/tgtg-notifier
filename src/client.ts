@@ -1,5 +1,12 @@
 import { errors } from 'undici';
 
+import { NotificationType, NotifierService, NotifierType } from './notifiers/notifierService.js';
+import { Discord, Gotify, Ntfy, Signal, Telegram } from './notifiers/index.js';
+import { SEND_START_NOTIFICATION } from './config.js';
+import { sleep, TEST_ITEM } from './common/utils.js';
+import { logger } from './common/logger.js';
+import database from './database.js';
+import api from './api.js';
 import {
   NotifierConfig,
   TelegramConfig,
@@ -8,13 +15,6 @@ import {
   SignalConfig,
   NtfyConfig,
 } from './notifiers/config/index.js';
-import { NotificationType, NotifierService, NotifierType } from './notifiers/notifierService.js';
-import { Discord, Gotify, Ntfy, Signal, Telegram } from './notifiers/index.js';
-import { sleep, TEST_ITEM } from './common/utils.js';
-import { LOCALE, SEND_START_NOTIFICATION, TIMEZONE } from './config.js';
-import { logger } from './common/logger.js';
-import database from './database.js';
-import api from './api.js';
 
 export class Client {
   private readonly email: string;
@@ -57,6 +57,8 @@ export class Client {
     };
   }
 
+  private accountIsFilled = (): Boolean => Boolean(this.email && this.alreadyLogged());
+
   private alreadyLogged = (): Boolean => Boolean(this.accessToken && this.refreshToken);
 
   private refreshAccessToken = async (): Promise<Boolean> => {
@@ -64,7 +66,7 @@ export class Client {
     try {
       const { access_token, refresh_token } = (await api.refreshToken(
         this.accessToken,
-        this.refreshToken,
+        this.refreshToken
       )) as TGTG_API_REFRESH;
 
       this.accessToken = access_token;
@@ -83,7 +85,9 @@ export class Client {
       const { state, polling_id } = (await api.loginByEmail(this.email)) as TGTG_API_LOGIN;
 
       if (state === 'TERMS') {
-        logger.error(`TGTG return your email "${this.email}" is not linked to an account, signup with this email first`);
+        logger.error(
+          `TGTG return your email "${this.email}" is not linked to an account, signup with this email first`
+        );
         return false;
       }
       if (state === 'WAIT') return this.startPolling(polling_id);
@@ -103,13 +107,13 @@ export class Client {
     logger.debug(`[Login start polling] ${this.email}`);
     try {
       for (const attempt of this.maxPollingTries.keys()) {
-        const {
-          access_token,
-          refresh_token,
-          statusCode,
-        } = await api.authPolling(this.email, pollingId) as TGTG_API_POLLING;
+        const { access_token, refresh_token, statusCode } = (await api.authPolling(
+          this.email,
+          pollingId
+        )) as TGTG_API_POLLING;
         if (statusCode === 202) {
-          if (attempt === 0) logger.warn('Check your email to continue, don\'t use your mobile if TGTG App is installed !');
+          if (attempt === 0)
+            logger.warn("Check your email to continue, don't use your mobile if TGTG App is installed !");
           await sleep(5000);
         }
         if (access_token && refresh_token) {
@@ -139,47 +143,14 @@ export class Client {
     const stock = await database.get(this.email, store['item']['item_id']);
     if ((!stock && store['items_available'] > 0) || (store['items_available'] > stock && stock === 0)) {
       logger.debug('New item available (%s) for store %s', store.items_available, store.display_name);
-      this.notifiers.forEach((notifier) =>
-        notifier.sendNotification(NotificationType.NEW_ITEM, this.parseStoreItem(store)),
-      );
+      this.notifiers.forEach((notifier) => notifier.sendNotification(NotificationType.NEW_ITEM, store));
     }
-  };
-
-  private parseStoreItem = (store: TGTG_ITEM): SENDABLE_ITEM => {
-    const { minor_units, code } = store['item']['item_price'];
-    const price = (minor_units / 100).toLocaleString(LOCALE, {
-      style: 'currency',
-      currency: code,
-    });
-
-    const { start, end } = store['pickup_interval'];
-    const pickupStart = new Date(start);
-    const pickupEnd = new Date(end);
-
-    const dateTime = new Intl.DateTimeFormat(LOCALE, {
-      timeZone: TIMEZONE,
-      timeStyle: 'short',
-    }).formatRange(pickupStart, pickupEnd);
-
-    const dateDiff = Math.round((pickupStart.getTime() - Date.now()) / 1000 / 60 / 60 / 24);
-    const relativeTime = new Intl.RelativeTimeFormat(LOCALE, { numeric: 'auto' })
-      .format(dateDiff, 'day')
-      .replace(/^\w/, (c) => c.toUpperCase());
-
-    return {
-      id: store['item']['item_id'],
-      name: store['display_name'],
-      available: store['items_available'].toString(),
-      price: price,
-      pickupTime: dateTime,
-      pickupDate: relativeTime,
-    };
   };
 
   public getItems = async (withStock = true): Promise<void> => {
     logger.debug(`[Get Items] ${this.email}`);
     try {
-      const { items } = await api.getItems(this.accessToken, withStock) as TGTG_STORES;
+      const { items } = (await api.getItems(this.accessToken, withStock)) as TGTG_STORES;
 
       for (const store of items) {
         await this.compareStock(store);
@@ -198,8 +169,8 @@ export class Client {
 
   public login = async (): Promise<Boolean> => {
     logger.debug(`[Login] ${this.email}`);
-    if (!this.email && !this.alreadyLogged()) {
-      logger.warn('You must provide at least Email or User-ID, Access-Token and Refresh-Token');
+    if (!this.accountIsFilled()) {
+      logger.error('You must provide at least Email or Access-Token and Refresh-Token');
       return false;
     }
     logger.debug(`Login account`);

@@ -1,9 +1,10 @@
+import { DEFAULT_APK_VERSION } from './constants.js';
 import { LOCALE, TIMEZONE } from '../config.js';
 
 export const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const getApkVersion = async (): Promise<string> => {
-  const defaultApkVersion = '24.11.0';
+  const defaultApkVersion = DEFAULT_APK_VERSION;
   let apkVersion = '';
 
   const apk = await fetch('https://play.google.com/store/apps/details?id=com.app.tgtg&hl=en&gl=US').then((res) =>
@@ -21,16 +22,58 @@ export const getApkVersion = async (): Promise<string> => {
   return apkVersion ? apkVersion : defaultApkVersion;
 };
 
-export const TEST_ITEM: SENDABLE_ITEM = {
-  id: '0',
-  name: 'Item name test notifier',
-  available: '10',
-  price: '3,99€',
-  pickupTime: new Intl.DateTimeFormat(LOCALE, {
+export const parseStoreItem = (store: TGTG_ITEM): SENDABLE_ITEM => {
+  const { minor_units, code } = store['item']['item_price'];
+  const price = (minor_units / 100).toLocaleString(LOCALE, {
+    style: 'currency',
+    currency: code,
+  });
+
+  const { start, end } = store['pickup_interval'];
+  const pickupStart = new Date(start);
+  const pickupEnd = new Date(end);
+
+  const dateTime = new Intl.DateTimeFormat(LOCALE, {
     timeZone: TIMEZONE,
     timeStyle: 'short',
-  }).formatRange(new Date(), new Date(Date.now() + 60000 * 10)),
-  pickupDate: new Intl.RelativeTimeFormat(LOCALE, { numeric: 'auto' })
-    .format(0, 'day')
-    .replace(/^\w/, (c) => c.toUpperCase()),
+  }).formatRange(pickupStart, pickupEnd);
+
+  const dateDiff = Math.round((pickupStart.getTime() - Date.now()) / 1000 / 60 / 60 / 24);
+  const relativeTime = new Intl.RelativeTimeFormat(LOCALE, { numeric: 'auto' })
+    .format(dateDiff, 'day')
+    .replace(/^\w/, (c) => c.toUpperCase());
+
+  return {
+    id: store['item']['item_id'],
+    name: store['display_name'],
+    available: store['items_available'].toString(),
+    price: price,
+    pickupTime: dateTime,
+    pickupDate: relativeTime,
+  };
+};
+
+export const TEST_ITEM: TGTG_ITEM = {
+  display_name: 'Item name test notifier',
+  items_available: 10,
+  item: {
+    item_id: '0',
+    item_price: {
+      code: 'EUR',
+      minor_units: 399,
+    },
+  },
+  pickup_interval: {
+    start: new Date().toString(),
+    end: new Date(Date.now() + 60000 * 10).toString(),
+  },
+  pickup_location: {
+    address: {
+      address_line: '',
+    },
+    location: {
+      longitude: 0,
+      latitude: 0,
+    },
+  },
 };

@@ -1,6 +1,5 @@
 declare type ACCOUNT = {
   email: string;
-  userId: string;
   accessToken: string;
   refreshToken: string;
   notifiers: Array<any>;
@@ -29,12 +28,6 @@ declare type TGTG_API_POLLING = {
 
 declare type TGTG_STORES = {
   items: TGTG_ITEM[];
-};
-
-declare type TGTG_FAVORITES_STORES = {
-  mobile_bucket: {
-    items: TGTG_ITEM[]
-  }
 };
 
 declare type TGTG_ITEM = {

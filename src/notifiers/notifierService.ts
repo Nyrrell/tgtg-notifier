@@ -1,5 +1,6 @@
 import { Logger } from 'winston';
 
+import { parseStoreItem } from '../common/utils.js';
 import { NotifierConfig } from './config/index.js';
 import { logger } from '../common/logger.js';
 
@@ -7,12 +8,12 @@ export abstract class NotifierService {
   protected abstract readonly request: Request;
   protected abstract readonly config: NotifierConfig;
 
-  public sendNotification(type: NotificationType, payload: string | SENDABLE_ITEM): Promise<void> {
+  public sendNotification(type: NotificationType, payload: string | TGTG_ITEM): Promise<void> {
     switch (type) {
       case NotificationType.START:
         return this.sendInfo(payload as string);
       case NotificationType.NEW_ITEM:
-        return this.sendItem(payload as SENDABLE_ITEM);
+        return this.sendItem(parseStoreItem(payload as TGTG_ITEM));
     }
   }
 
