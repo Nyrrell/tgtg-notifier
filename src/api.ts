@@ -3,7 +3,7 @@ import * as zlib from 'node:zlib';
 
 import { getApkVersion, sleep } from './common/utils.js';
 import { logger } from './common/logger.js';
-import { JOB } from './app.js';
+import { JOB } from './common/job.js';
 
 class TGTG_API {
   private readonly BASE_URL: string = 'https://apptoogoodtogo.com/api/';
@@ -39,7 +39,7 @@ class TGTG_API {
       if (res.headers?.['content-encoding'] === 'gzip') {
         const arrayBuffer = await res.body.arrayBuffer();
         const bufferData = zlib.gunzipSync(arrayBuffer);
-        data = bufferData.toString()
+        data = bufferData.toString();
       } else {
         data = await res.body.text();
       }
@@ -120,7 +120,11 @@ class TGTG_API {
     });
   }
 
-  getItems(accessToken: string, withStock: boolean = true, favorite: boolean = true): Promise<TGTG_STORES | Dispatcher.ResponseData> {
+  getItems(
+    accessToken: string,
+    withStock: boolean = true,
+    favorite: boolean = true
+  ): Promise<TGTG_STORES | Dispatcher.ResponseData> {
     return this.fetch(ENDPOINT.ITEM, {
       headers: {
         authorization: `Bearer ${accessToken}`,

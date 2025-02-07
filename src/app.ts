@@ -1,11 +1,9 @@
 import { exit, env } from 'node:process';
-import { Cron } from 'croner';
 
-import { ACCOUNTS, CRON_SCHEDULE, TEST_NOTIFIERS } from './config.js';
+import { ACCOUNTS, TEST_NOTIFIERS } from './config.js';
 import { logger } from './common/logger.js';
+import { JOB } from './common/job.js';
 import { Client } from './client.js';
-
-export const JOB: Cron = Cron(CRON_SCHEDULE, { protect: true });
 
 const main = async (): Promise<void> => {
   const clientsToMonitor: Client[] = [];
