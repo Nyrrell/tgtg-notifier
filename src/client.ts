@@ -57,7 +57,7 @@ export class Client {
     };
   }
 
-  private accountIsFilled = (): Boolean => Boolean(this.email && this.alreadyLogged());
+  private accountIsFilled = (): Boolean => Boolean(this.email || this.alreadyLogged());
 
   private alreadyLogged = (): Boolean => Boolean(this.accessToken && this.refreshToken);
 
