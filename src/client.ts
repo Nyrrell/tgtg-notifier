@@ -107,11 +107,11 @@ export class Client {
     logger.debug(`[Login start polling] ${this.email}`);
     try {
       for (const attempt of this.maxPollingTries.keys()) {
-        const { access_token, refresh_token, statusCode } = (await api.authPolling(
+        const { access_token, refresh_token, polling } = (await api.authPolling(
           this.email,
           pollingId
         )) as TGTG_API_POLLING;
-        if (statusCode === 202) {
+        if (polling) {
           if (attempt === 0)
             logger.warn("Check your email to continue, don't use your mobile if TGTG App is installed !");
           await sleep(5000);

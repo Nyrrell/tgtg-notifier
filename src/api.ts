@@ -1,5 +1,4 @@
-import { Dispatcher, request, errors } from 'undici';
-import * as zlib from 'node:zlib';
+import { fetch, errors } from 'undici';
 
 import { getApkVersion, sleep } from './common/utils.js';
 import { logger } from './common/logger.js';
@@ -21,37 +20,29 @@ class TGTG_API {
     return this.LIST_USER_AGENT[Math.floor(Math.random() * this.LIST_USER_AGENT.length)].replace('{apk}', apk);
   }
 
-  private async fetch<T>(endpoint: string, { headers, body }: TGTG_API_PARAMS): Promise<T | Dispatcher.ResponseData> {
+  private async fetch<T>(endpoint: string, { headers, body }: TGTG_API_PARAMS): Promise<T> {
     if (!this.userAgent) {
       this.userAgent = await this.getUserAgent();
     }
 
-    const res = await request(this.BASE_URL + endpoint, this.setRequest({ headers, body }));
-    logger.debug(`[Status Code] ${res.statusCode}`);
+    const res = await fetch(this.BASE_URL + endpoint, this.setRequest({ headers, body }));
+    logger.debug(`[Status Code] ${res.status}`);
 
-    this.cookie = res.headers['set-cookie']?.toString().split(';')[0] as string;
+    this.cookie = res.headers.get('set-cookie')?.split(';')[0] as string;
+    const data = await res.text();
 
-    if (res.statusCode >= 200 && res.statusCode < 300) {
+    if (endpoint === ENDPOINT.AUTH_POLLING && res.status === 202) return { polling: true } as T;
+
+    if (res.status >= 200 && res.status < 300) {
       this.captchaError = 0;
-      if (endpoint === ENDPOINT.AUTH_POLLING && res.statusCode === 202) return res;
-
-      let data: string;
-      if (res.headers?.['content-encoding'] === 'gzip') {
-        const arrayBuffer = await res.body.arrayBuffer();
-        const bufferData = zlib.gunzipSync(arrayBuffer);
-        data = bufferData.toString();
-      } else {
-        data = await res.body.text();
-      }
-
       return JSON.parse(data) as T;
     }
 
-    if (res.statusCode === 403) {
+    if (res.status === 403) {
       this.captchaError++;
       logger.error(`Error 403 [${this.captchaError}]`);
     } else {
-      throw new errors.ResponseStatusCodeError(await res.body.text(), res.statusCode);
+      throw new errors.ResponseStatusCodeError(data, res.status);
     }
 
     if (this.captchaError === 1) {
@@ -90,7 +81,7 @@ class TGTG_API {
     };
   }
 
-  async loginByEmail(email: string): Promise<TGTG_API_LOGIN | Dispatcher.ResponseData> {
+  async loginByEmail(email: string): Promise<TGTG_API_LOGIN> {
     return this.fetch(ENDPOINT.AUTH_BY_EMAIL, {
       body: {
         device_type: 'ANDROID',
@@ -99,7 +90,7 @@ class TGTG_API {
     });
   }
 
-  authPolling(email: string, pollingId: string): Promise<TGTG_API_POLLING | Dispatcher.ResponseData> {
+  authPolling(email: string, pollingId: string): Promise<TGTG_API_POLLING> {
     return this.fetch(ENDPOINT.AUTH_POLLING, {
       body: {
         device_type: 'ANDROID',
@@ -109,7 +100,7 @@ class TGTG_API {
     });
   }
 
-  refreshToken(accessToken: string, refreshToken: string): Promise<TGTG_API_REFRESH | Dispatcher.ResponseData> {
+  refreshToken(accessToken: string, refreshToken: string): Promise<TGTG_API_REFRESH> {
     return this.fetch(ENDPOINT.REFRESH_TOKEN, {
       headers: {
         authorization: `Bearer ${accessToken}`,
@@ -120,11 +111,7 @@ class TGTG_API {
     });
   }
 
-  getItems(
-    accessToken: string,
-    withStock: boolean = true,
-    favorite: boolean = true
-  ): Promise<TGTG_STORES | Dispatcher.ResponseData> {
+  getItems(accessToken: string, withStock: boolean = true, favorite: boolean = true): Promise<TGTG_STORES> {
     return this.fetch(ENDPOINT.ITEM, {
       headers: {
         authorization: `Bearer ${accessToken}`,
