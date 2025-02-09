@@ -16,10 +16,13 @@ export class Signal extends NotifierService {
   }
 
   private getDefaultPayload() {
-    return {
-      number: this.config.number,
-      recipients: this.config.recipients,
-    };
+    return JSON.parse(
+      JSON.stringify({
+        number: this.config.number,
+        recipients: this.config.recipients,
+        notify_self: this.config.notifySelf,
+      })
+    );
   }
 
   protected async sendInfo(message: string): Promise<void> {

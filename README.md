@@ -96,6 +96,8 @@ and `refreshToken` if you already have it).
   - Registered Phone Number
 - <b>recipients</b> : _array\<string\>_ = `["group.ckRzaEd4VmRzNnJaASAEsasa", "+4912812812121"]`
   - Accept group-id and phone number
+- <b>notifySelf</b>? : _boolean_ = `false`
+  - Optional setting it to `false` will prevent your devices from generating a notification when you send a message yourself.
 
 >Tested with [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api) but [python-signal-cli-rest-api](https://gitlab.com/morph027/python-signal-cli-rest-api/) will work too, project documentation say :  
 >_It is quite similar to bbernhard/signal-cli-rest-api, [...] i’m tempted to mimic bbernhard’s API routes as close as possible._
@@ -136,7 +138,7 @@ npm run build
 npm run start
 ```
 
-If you don't set `userId`, `accessToken` and `refreshToken` You should receive an email from Too Good To Go.<br>
+If you don't set `accessToken` and `refreshToken` You should receive an email from Too Good To Go.<br>
 You must validate the login by clicking the link inside this email within 2 minute (Do not use your phone if Too Good To
 Go app is installed).<br>
 
