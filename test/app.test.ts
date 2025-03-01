@@ -37,7 +37,7 @@ test(
 test('Get item', async () => {
   await database.getInstance.clear();
   await client['getItems'](false);
-  expect(getDbSize()).toBeGreaterThan(0);
+  expect(await getDbSize()).toBeGreaterThan(0);
 });
 
 test('Refresh token', async () => {
