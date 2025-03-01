@@ -1,4 +1,4 @@
-import { fetch, errors } from 'undici';
+import { fetch } from 'undici';
 
 import { getApkVersion, sleep } from './common/utils.js';
 import { logger } from './common/logger.js';
@@ -42,7 +42,7 @@ class TGTG_API {
       this.captchaError++;
       logger.error(`Error 403 [${this.captchaError}]`);
     } else {
-      throw new errors.ResponseStatusCodeError(data, res.status);
+      throw new Error(`Status: ${res.status}, Data: ${data}`);
     }
 
     if (this.captchaError === 1) {
@@ -131,7 +131,7 @@ class TGTG_API {
 
 enum ENDPOINT {
   AUTH_POLLING = 'auth/v5/authByRequestPollingId',
-  REFRESH_TOKEN = 'auth/v5/token/refresh',
+  REFRESH_TOKEN = 'token/v1/refresh',
   AUTH_BY_EMAIL = 'auth/v5/authByEmail',
   ITEM = 'item/v8/',
 }
