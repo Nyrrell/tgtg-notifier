@@ -1,6 +1,7 @@
 import { fetch } from 'undici';
 
 import { getApkVersion, sleep } from './common/utils.js';
+import { ApiError } from './common/errors.js';
 import { logger } from './common/logger.js';
 import { JOB } from './common/job.js';
 
@@ -41,27 +42,28 @@ class TGTG_API {
     if (res.status === 403) {
       this.captchaError++;
       logger.error(`Error 403 [${this.captchaError}]`);
-    } else {
-      throw new Error(`Status: ${res.status}, Data: ${data}`);
+      switch (this.captchaError) {
+        case 1:
+          this.userAgent = await this.getUserAgent();
+          break;
+        case 5:
+          this.cookie = '';
+          break;
+        case 10:
+          logger.warn('Too many captcha Errors !');
+          logger.info('Sleeping 10 minutes');
+          JOB.pause();
+          await sleep(1000 * 60 * 10);
+          logger.info('Retrying');
+          this.captchaError = 0;
+          JOB.resume();
+          break;
+      }
+      await sleep(10000);
+      return this.fetch(endpoint, { headers, body });
     }
 
-    if (this.captchaError === 1) {
-      this.userAgent = await this.getUserAgent();
-    }
-    if (this.captchaError === 4) {
-      this.cookie = '';
-    }
-    if (this.captchaError >= 10) {
-      logger.warn('Too many captcha Errors !');
-      logger.info('Sleeping 10 minutes');
-      JOB.pause();
-      await sleep(1000 * 60 * 10);
-      logger.info('Retrying');
-      this.captchaError = 0;
-      JOB.resume();
-    }
-    await sleep(10000);
-    return this.fetch(endpoint, { headers, body });
+    throw new ApiError(res.status, data);
   }
 
   private setRequest({ headers, body }: TGTG_API_PARAMS): {} {

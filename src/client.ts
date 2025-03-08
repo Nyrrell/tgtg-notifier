@@ -1,9 +1,8 @@
-import { errors } from 'undici';
-
 import { NotificationType, NotifierService, NotifierType } from './notifiers/notifierService.js';
 import { Discord, Gotify, Ntfy, Signal, Telegram } from './notifiers/index.js';
 import { SEND_START_NOTIFICATION } from './config.js';
 import { sleep, TEST_ITEM } from './common/utils.js';
+import { ApiError } from './common/errors.js';
 import { logger } from './common/logger.js';
 import database from './database.js';
 import api from './api.js';
@@ -93,10 +92,9 @@ export class Client {
       if (state === 'WAIT') return this.startPolling(polling_id);
     } catch (error) {
       logger.error(`[Login By Email] ${this.email}`);
-      if (error instanceof errors.ResponseStatusCodeError) {
-        if (error.status === 429) {
-          logger.error('Too many requests. Try again later');
-        }
+      if (error instanceof ApiError && error.status === 429) {
+        logger.error('Too many requests. Try again later');
+        return false;
       }
       logger.error(error);
       return false;
@@ -129,8 +127,8 @@ export class Client {
       logger.warn('Max polling retries reached. Try again.');
       return false;
     } catch (error) {
-      if (error instanceof errors.ResponseStatusCodeError && error.status === 429) {
-        logger.warn('Too many requests. Try again later.');
+      if (error instanceof ApiError && error.status === 429) {
+        logger.error('Too many requests. Try again later.');
         return false;
       }
 
@@ -158,7 +156,7 @@ export class Client {
       }
     } catch (error) {
       logger.error(`[Get Items] ${this.email}`);
-      if (error instanceof errors.ResponseStatusCodeError) {
+      if (error instanceof ApiError) {
         if (error.status === 401 && (await this.refreshAccessToken())) {
           return this.getItems();
         }
