@@ -1,6 +1,6 @@
 import { validateSync } from 'class-validator';
 
-import { NotifierType } from '../notifierService.js';
+import { NotifierType } from '../service.ts';
 
 export abstract class NotifierConfig {
   type: NotifierType;

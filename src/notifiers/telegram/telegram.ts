@@ -1,8 +1,8 @@
-import { NotifierService } from './notifierService.js';
-import { TelegramConfig } from './config/index.js';
-import { PRICE, STOCK } from '../config.js';
+import { PRICE, STOCK } from '../../config.ts';
+import { Notifier } from '../base/notifier.ts';
+import { TelegramConfig } from './config.ts';
 
-export class Telegram extends NotifierService {
+export class Telegram extends Notifier {
   protected readonly request: Request;
   protected readonly config: TelegramConfig;
 
