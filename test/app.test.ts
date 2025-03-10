@@ -1,11 +1,12 @@
-import { ACCOUNTS } from '../src/config.js';
-import { Client } from '../src/client.js';
-import database from '../src/database.js';
+import type { Notifier } from '../src/notifiers/base/notifier.ts';
+import { ACCOUNTS } from '../src/config.ts';
+import { Client } from '../src/client.ts';
+import database from '../src/database.ts';
 
 const [account] = ACCOUNTS;
 const client = new Client(account);
 
-const noAccount = { email: '', accessToken: '', refreshToken: '', notifiers: [] };
+const noAccount = { email: '', accessToken: '', refreshToken: '', notifiers: [] as Notifier[] };
 
 const getDbSize = async () => {
   const values = [];

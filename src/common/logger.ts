@@ -1,7 +1,7 @@
 import { Logger, format, transports, createLogger } from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 
-import { LOG_LEVEL } from '../config.js';
+import { LOG_LEVEL } from '../config.ts';
 
 const transportConsole: transports.ConsoleTransportInstance = new transports.Console({
   format: format.colorize({

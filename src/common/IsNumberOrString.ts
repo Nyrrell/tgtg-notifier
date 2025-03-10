@@ -1,4 +1,4 @@
-import { ValidationArguments, ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator';
+import { type ValidationArguments, ValidatorConstraint, type ValidatorConstraintInterface } from 'class-validator';
 
 @ValidatorConstraint()
 export class IsNumberOrString implements ValidatorConstraintInterface {

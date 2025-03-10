@@ -1,5 +1,5 @@
 import { Cron } from 'croner';
 
-import { CRON_SCHEDULE } from '../config.js';
+import { CRON_SCHEDULE } from '../config.ts';
 
-export const JOB: Cron = Cron(CRON_SCHEDULE, { protect: true });
+export const JOB: Cron = new Cron(CRON_SCHEDULE, { protect: true });

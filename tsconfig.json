@@ -1,16 +1,20 @@
 {
   "compilerOptions": {
+    "module": "NodeNext",
+    "target": "ESNext",
     "outDir": "./dist",
-    "target": "ES2022",
-    "strict": true,
-    "module": "ES2022",
+    "rewriteRelativeImportExtensions": true,
     "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": true,
     "experimentalDecorators": true,
-    "esModuleInterop": true,
-    "moduleResolution": "Node16",
+    "verbatimModuleSyntax": true,
     "noImplicitAny": true,
     "alwaysStrict": true
   },
   "include": ["./src/**/*"],
-  "files": ["src/@types/index.d.ts"]
+  "ts-node": {
+    "experimentalSpecifierResolution": "node",
+    "transpileOnly": true,
+    "esm": true
+  }
 }

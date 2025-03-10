@@ -1,9 +1,9 @@
 import { fetch } from 'undici';
 
-import { getApkVersion, sleep } from './common/utils.js';
-import { ApiError } from './common/errors.js';
-import { logger } from './common/logger.js';
-import { JOB } from './common/job.js';
+import { getApkVersion, sleep } from './common/utils.ts';
+import { ApiError } from './common/errors.ts';
+import { logger } from './common/logger.ts';
+import { JOB } from './common/job.ts';
 
 class TGTG_API {
   private readonly BASE_URL: string = 'https://apptoogoodtogo.com/api/';

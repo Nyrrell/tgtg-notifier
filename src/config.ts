@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { exit } from 'node:process';
 
-import * as CONSTANT from './common/constants.js';
+import * as CONSTANT from './common/constants.ts';
 
 const configFile = await readFile('./config.json', 'utf8').catch(({ message }) => console.error(message));
 

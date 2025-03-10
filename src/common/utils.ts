@@ -1,5 +1,5 @@
-import { DEFAULT_APK_VERSION } from './constants.js';
-import { LOCALE, TIMEZONE } from '../config.js';
+import { DEFAULT_APK_VERSION } from './constants.ts';
+import { LOCALE, TIMEZONE } from '../config.ts';
 
 export const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
