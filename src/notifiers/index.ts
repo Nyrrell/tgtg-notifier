@@ -4,6 +4,8 @@ export * from './discord/discord.ts';
 export * from './discord/config.ts';
 export * from './gotify/gotify.ts';
 export * from './gotify/config.ts';
+export * from './notica/notica.ts';
+export * from './notica/config.ts';
 export * from './signal/signal.ts';
 export * from './signal/config.ts';
 export * from './ntfy/config.ts';

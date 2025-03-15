@@ -4,11 +4,13 @@ import {
   type TelegramConfig,
   type DiscordConfig,
   type GotifyConfig,
+  type NoticaConfig,
   type SignalConfig,
   type NtfyConfig,
   Telegram,
   Discord,
   Gotify,
+  Notica,
   Signal,
   Ntfy,
 } from './index.ts';
@@ -17,6 +19,7 @@ export enum NotifierType {
   TELEGRAM = 'telegram',
   DISCORD = 'discord',
   GOTIFY = 'gotify',
+  NOTICA = 'notica',
   SIGNAL = 'signal',
   NTFY = 'ntfy',
 }
@@ -39,6 +42,8 @@ export const setNotifiers = (notifierConfigs: Array<NotifierConfig>): Notifier[]
         return new Telegram(notifier as TelegramConfig);
       case NotifierType.NTFY:
         return new Ntfy(notifier as NtfyConfig);
+      case NotifierType.NOTICA:
+        return new Notica(notifier as NoticaConfig);
     }
   });
 };

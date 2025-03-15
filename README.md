@@ -115,6 +115,13 @@ and `refreshToken` if you already have it).
 - **messageThreadId**? : _number_ = `6`
   - Unique identifier for the target message thread (topic) of the forum (optional)
 </details>
+<details>
+<summary><b>NOTICA</b></summary>
+
+- <b>type</b> : _string_ = `notica`
+- <b>apiUrl</b> : _string_ = `https://notica.us`
+- <b>room</b> : _string_ = `?abc123`
+</details>
 
 ### Global configuration details
 | Name                    | Default      | Description                                                                                                                     |
@@ -181,4 +188,8 @@ docker-compose up -d
 <details><summary><b>TELEGRAM</b></summary>
 
 ![notif](media/notifiers/telegram.png)
+</details>
+<details><summary><b>NOTICA</b></summary>
+
+![notif](media/notifiers/notica.png)
 </details>
