@@ -1,6 +1,6 @@
-import { PRICE, STOCK } from '../../config.js';
-import { Notifier } from '../base/notifier.js';
-import { NoticaConfig } from './config.js';
+import { PRICE, STOCK } from '../../config.ts';
+import { Notifier } from '../base/notifier.ts';
+import { NoticaConfig } from './config.ts';
 
 export class Notica extends Notifier {
   protected readonly request: Request;
