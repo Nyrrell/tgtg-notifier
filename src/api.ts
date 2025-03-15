@@ -1,5 +1,3 @@
-import { fetch } from 'undici';
-
 import { getApkVersion, sleep } from './common/utils.ts';
 import { ApiError } from './common/errors.ts';
 import { logger } from './common/logger.ts';
