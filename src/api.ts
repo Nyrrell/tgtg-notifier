@@ -15,6 +15,7 @@ class TGTG_API {
   private captchaError: number = 0;
   private userAgent: string = '';
   private cookie: string = '';
+  private xCorrelationId: string = '';
 
   private async getUserAgent(): Promise<string> {
     const apk = await getApkVersion();
@@ -30,6 +31,7 @@ class TGTG_API {
     logger.debug(`[Status Code] ${res.status}`);
 
     this.cookie = res.headers.get('set-cookie')?.split(';')[0] as string;
+    this.xCorrelationId = res.headers.get('x-correlation-id');
     const data = await res.text();
 
     if (endpoint === ENDPOINT.AUTH_POLLING && res.status === 202) return { polling: true } as T;
@@ -78,6 +80,7 @@ class TGTG_API {
         'accept-language': 'en-GB',
         'accept-encoding': 'gzip',
         ...(this.cookie && { Cookie: this.cookie }),
+        ...(this.xCorrelationId && { 'x-correlation-id': this.xCorrelationId }),
       },
       body: JSON.stringify(body),
     };
