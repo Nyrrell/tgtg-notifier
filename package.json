@@ -2,7 +2,7 @@
   "name": "tgtg-notifier",
   "description": "Monitors your favorite TGTG Store for newly available items",
   "author": "Nyrrell",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "type": "module",
   "main": "src/app.js",
   "license": "MIT",
@@ -34,11 +34,12 @@
     "class-validator": "^0.14.1",
     "croner": "^9.0.0",
     "keyv": "^5.3.1",
-    "undici": "^7.3.0",
+    "undici": "^7.9.0",
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0"
   },
   "engines": {
     "node": ">=20.18.1"
-  }
+  },
+  "packageManager": "pnpm@10.11.0+sha512.6540583f41cc5f628eb3d9773ecee802f4f9ef9923cc45b69890fb47991d4b092964694ec3a4f738a420c918a333062c8b925d312f42e4f0c263eb603551f977"
 }

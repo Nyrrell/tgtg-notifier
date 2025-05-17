@@ -1,4 +1,5 @@
-import { fetch } from 'undici';
+import * as zlib from 'node:zlib';
+import { request } from 'undici';
 
 import { getApkVersion, sleep } from './common/utils.ts';
 import { ApiError } from './common/errors.ts';
@@ -27,21 +28,29 @@ class TGTG_API {
       this.userAgent = await this.getUserAgent();
     }
 
-    const res = await fetch(this.BASE_URL + endpoint, this.setRequest({ headers, body }));
-    logger.debug(`[Status Code] ${res.status}`);
+    const options = this.setRequest({ headers, body });
+    const res = await request(this.BASE_URL + endpoint, options);
+    logger.debug(`[Status Code] ${res.statusCode}`);
 
-    this.cookie = res.headers.get('set-cookie')?.split(';')[0] as string;
-    this.xCorrelationId = res.headers.get('x-correlation-id');
-    const data = await res.text();
+    this.cookie = res.headers['set-cookie']?.toString().split(';')[0] as string;
+    this.xCorrelationId = res.headers['x-correlation-id'] as string;
 
-    if (endpoint === ENDPOINT.AUTH_POLLING && res.status === 202) return { polling: true } as T;
+    let data: string;
+    if (res.headers?.['content-encoding'] === 'gzip') {
+      const arrayBuffer = await res.body.arrayBuffer();
+      data = zlib.gunzipSync(arrayBuffer).toString();
+    } else {
+      data = await res.body.text();
+    }
 
-    if (res.status >= 200 && res.status < 300) {
+    if (endpoint === ENDPOINT.AUTH_POLLING && res.statusCode === 202) return { polling: true } as T;
+
+    if (res.statusCode >= 200 && res.statusCode < 300) {
       this.captchaError = 0;
       return JSON.parse(data) as T;
     }
 
-    if (res.status === 403) {
+    if (res.statusCode === 403) {
       this.captchaError++;
       logger.error(`Error 403 [${this.captchaError}]`);
       switch (this.captchaError) {
@@ -65,7 +74,7 @@ class TGTG_API {
       return this.fetch(endpoint, { headers, body });
     }
 
-    throw new ApiError(res.status, data);
+    throw new ApiError(res.statusCode, data);
   }
 
   private setRequest({ headers, body }: TGTG_API_PARAMS): {} {
