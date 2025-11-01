@@ -147,7 +147,7 @@ enum ENDPOINT {
   AUTH_POLLING = 'auth/v5/authByRequestPollingId',
   REFRESH_TOKEN = 'token/v1/refresh',
   AUTH_BY_EMAIL = 'auth/v5/authByEmail',
-  ITEM = 'item/v8/',
+  ITEM = 'item/v9/',
 }
 
 export default new TGTG_API();
