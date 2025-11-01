@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/Nyrrell/tgtg-notifier/compare/1.2.3...1.3.0) (2025-11-01)
+
+
+### Features
+
+* update node minimum version for sementic-release ([43b7dc6](https://github.com/Nyrrell/tgtg-notifier/commit/43b7dc6898d5c1be1c187c8c37b109f1d31be75f))
+
 ## [1.2.3](https://github.com/Nyrrell/tgtg-notifier/compare/1.2.2...1.2.3) (2025-11-01)
 
 
