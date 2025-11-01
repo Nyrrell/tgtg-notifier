@@ -137,7 +137,7 @@ and `refreshToken` if you already have it).
 
 ## Run
 
-First you need to install [Node.js](https://nodejs.org/) 20.18.1 or higher
+First you need to install [Node.js](https://nodejs.org/) 22.14.0 or higher
 
 ```zsh
 npm install
