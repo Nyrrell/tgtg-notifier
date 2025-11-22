@@ -158,14 +158,56 @@ A Dockerfile is available in the repository to build a ready-to-run Docker image
 You need to map the volumes to use your `config.json` file and a folder for the application's `logs`.
 
 ```zsh
-docker build -t tgtg-notifier-app .
-docker run --name tgtg-notifier-app -d -v ./config.json:/usr/app/config.json -v ./logs/:/usr/app/logs tgtg-notifier-app
+docker build -t tgtg-notifier .
+docker run --name tgtg-notifier -d -v ./config.json:/usr/app/config.json -v ./logs/:/usr/app/logs tgtg-notifier-app
 ```
 
 If you prefer to use Docker Compose, a `docker-compose.yml` configuration file is also available.
 
 ```zsh
 docker-compose up -d
+```
+
+## Running with Podman Quadlet
+
+You will need to create two configuration files in your Systemd user directory : `~/.config/containers/systemd/`
+
+### 1\. Container File: `tgtg-notifier.container`
+```ini
+[Unit]
+Description=TGTG Notifier
+
+# Dependency on the build unit to ensure the image exists before starting the container.
+Requires=tgtg-notifier.service
+After=tgtg-notifier.service
+
+[Container]
+ContainerName=tgtg-notifier
+Image=tgtg-notifier.build
+
+# The volume mounts the config.json file as read-only (ro).
+Volume=%h/tgtg-notifier/config.json:/usr/app/config.json:ro
+
+[Service]
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=default.target
+```
+
+### 2\. Image Build File: `tgtg-notifier.build`
+```ini
+[Build]
+ImageTag=localhost/tgtg-notifier:latest
+SetWorkingDirectory=https://github.com/Nyrrell/tgtg-notifier.git
+```
+
+Finally, reload Systemd and start the container:
+
+```zsh
+systemctl --user daemon-reload
+systemctl --user start tgtg-notifier.service
 ```
 
 ### Notification example
