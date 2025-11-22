@@ -178,8 +178,8 @@ You will need to create two configuration files in your Systemd user directory :
 Description=TGTG Notifier
 
 # Dependency on the build unit to ensure the image exists before starting the container.
-Requires=tgtg-notifier.service
-After=tgtg-notifier.service
+Requires=tgtg-notifier.build
+After=tgtg-notifier.build
 
 [Container]
 ContainerName=tgtg-notifier
