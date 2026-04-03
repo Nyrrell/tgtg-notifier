@@ -4,6 +4,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
     volumes:
       - ./config.json:/usr/app/config.json
       - ./logs/:/usr/app/logs
