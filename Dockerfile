@@ -1,11 +1,16 @@
 FROM node:22-alpine
 
-WORKDIR usr/app
-COPY ./ ./
-RUN yarn install \
-&& yarn build \
-&& rm -rf node_modules \
-&& yarn install --production \
-&& yarn cache clean
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+ENV CI=true
 
-CMD yarn start
+RUN corepack enable
+
+WORKDIR /usr/app
+COPY ./ ./
+
+RUN pnpm install --frozen-lockfile \
+  && pnpm build \
+  && pnpm prune --prod
+
+CMD pnpm start
