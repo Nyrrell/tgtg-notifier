@@ -24,3 +24,4 @@ export const SEND_START_NOTIFICATION: boolean = Boolean(
   getEnv('TGTG_SEND_START_NOTIFICATION', config.sendStartNotification, true)
 );
 export const CRON_SCHEDULE: string = getEnv('TGTG_CRON_SCHEDULE', config.cronSchedule, CONSTANT.DEFAULT_CRON_SCHEDULE);
+export const PORT: number = parseInt(getEnv('TGTG_PORT', config.port, CONSTANT.DEFAULT_PORT), 10);

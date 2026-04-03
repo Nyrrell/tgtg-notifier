@@ -3,7 +3,7 @@ import { exit, env } from 'node:process';
 import { ACCOUNTS, TEST_NOTIFIERS } from './config.ts';
 import { logger } from './common/logger.ts';
 import { JOB } from './common/job.ts';
-import { Client } from './client.ts';
+import { Client } from './tgtg/client.ts';
 
 const main = async (): Promise<void> => {
   const clientsToMonitor: Client[] = [];

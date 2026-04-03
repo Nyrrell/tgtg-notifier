@@ -5,3 +5,4 @@ export const DEFAULT_TIMEZONE = 'UTC';
 export const DEFAULT_LOCALE = 'en-US';
 export const DEFAULT_LOG_LEVEL = 'info';
 export const DEFAULT_CRON_SCHEDULE = '* * * * *';
+export const DEFAULT_PORT = '3000';

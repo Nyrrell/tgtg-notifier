@@ -1,11 +1,12 @@
-import { setNotifiers, NotificationType } from './notifiers/service.ts';
-import type { NotifierConfig } from './notifiers/base/config.ts';
-import type { Notifier } from './notifiers/base/notifier.ts';
-import { SEND_START_NOTIFICATION } from './config.ts';
-import { sleep, TEST_ITEM } from './common/utils.ts';
-import { ApiError } from './common/errors.ts';
-import { logger } from './common/logger.ts';
-import database from './database.ts';
+import { setNotifiers, NotificationType } from '../notifiers/service.ts';
+import type { NotifierConfig } from '../notifiers/base/config.ts';
+import type { Notifier } from '../notifiers/base/notifier.ts';
+import { SEND_START_NOTIFICATION } from '../config.ts';
+import { TEST_ITEM } from '../common/utils.ts';
+import { ApiError } from '../common/errors.ts';
+import { logger } from '../common/logger.ts';
+import { promptPin } from './pin-prompt.ts';
+import database from '../database.ts';
 import api from './api.ts';
 
 export class Client {
@@ -63,7 +64,9 @@ export class Client {
         );
         return false;
       }
-      if (state === 'WAIT') return this.startPolling(polling_id);
+      if (state === 'WAIT') {
+        return this.authByRequestPin(polling_id);
+      }
     } catch (error) {
       logger.error(`[Login By Email] ${this.email}`);
       if (error instanceof ApiError && error.status === 429) {
@@ -75,31 +78,24 @@ export class Client {
     }
   };
 
-  private startPolling = async (pollingId: string): Promise<Boolean> => {
-    logger.debug(`[Login start polling] ${this.email}`);
+  private authByRequestPin = async (pollingId: string): Promise<Boolean> => {
+    logger.debug(`[Auth By Request Pin] ${this.email}`);
+
     try {
-      for (const attempt of this.maxPollingTries.keys()) {
-        const { access_token, refresh_token, polling } = (await api.authPolling(
-          this.email,
-          pollingId
-        )) as TGTG_API_POLLING;
-        if (polling) {
-          if (attempt === 0)
-            logger.warn("Check your email to continue, don't use your mobile if TGTG App is installed !");
-          await sleep(5000);
-        }
-        if (access_token && refresh_token) {
-          logger.info(`Successfully Logged`);
-          this.accessToken = access_token;
-          this.refreshToken = refresh_token;
-          logger.info('Printing account credentials');
-          logger.info('%o', this.credentials);
-          return true;
-        }
+      const pin = await promptPin();
+
+      const { access_token, refresh_token } = (await api.authByRequestPin(this.email, pollingId, pin)) as TGTG_API_AUTH;
+
+      if (!access_token || !refresh_token) {
+        return false;
       }
 
-      logger.warn('Max polling retries reached. Try again.');
-      return false;
+      logger.info(`Successfully Logged`);
+      this.accessToken = access_token;
+      this.refreshToken = refresh_token;
+      logger.info('Printing account credentials');
+      logger.info('%o', this.credentials);
+      return true;
     } catch (error) {
       if (error instanceof ApiError && error.status === 429) {
         logger.error('Too many requests. Try again later.');

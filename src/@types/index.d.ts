@@ -20,8 +20,7 @@ declare type TGTG_API_LOGIN = {
   polling_id: string;
 };
 
-declare type TGTG_API_POLLING = {
-  polling: boolean;
+declare type TGTG_API_AUTH = {
   access_token: string;
   refresh_token: string;
 };
