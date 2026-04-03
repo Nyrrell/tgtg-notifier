@@ -1,3 +1,11 @@
+# [1.4.0](https://github.com/Nyrrell/tgtg-notifier/compare/1.3.0...1.4.0) (2026-04-03)
+
+
+### Features
+
+* deal with error 403 and now login with pin code ([c972a68](https://github.com/Nyrrell/tgtg-notifier/commit/c972a682bec50789cdc3fb38ef14559ce786a916))
+* support env variable for global config ([f5f156d](https://github.com/Nyrrell/tgtg-notifier/commit/f5f156d94588d8ad8bcfc07381748e2debd3a09f))
+
 # [1.3.0](https://github.com/Nyrrell/tgtg-notifier/compare/1.2.3...1.3.0) (2025-11-01)
 
 
