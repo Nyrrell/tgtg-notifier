@@ -22,6 +22,16 @@ export const getApkVersion = async (): Promise<string> => {
   return apkVersion ? apkVersion : defaultApkVersion;
 };
 
+export const getEnv = <T = string>(envKey: string, configValue: T, defaultValue: T): T => {
+  const envValue = process.env[envKey];
+
+  if (envValue !== undefined) {
+    return envValue as T;
+  }
+
+  return configValue ?? defaultValue;
+};
+
 export const parseStoreItem = (store: TGTG_ITEM): SENDABLE_ITEM => {
   const { minor_units, code } = store['item']['item_price'];
   const price = (minor_units / 100).toLocaleString(LOCALE, {
