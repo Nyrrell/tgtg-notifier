@@ -232,6 +232,8 @@ After=tgtg-notifier.build
 ContainerName=tgtg-notifier
 Image=tgtg-notifier.build
 
+PublishPort=3000:3000
+
 Volume=%h/tgtg-notifier/config.json:/usr/app/config.json:ro
 
 [Service]
