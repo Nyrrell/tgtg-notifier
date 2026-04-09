@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/Nyrrell/tgtg-notifier/compare/1.4.0...1.4.1) (2026-04-09)
+
+
+### Bug Fixes
+
+* add custom hostname config ([e27f809](https://github.com/Nyrrell/tgtg-notifier/commit/e27f8093f4cf00af0085e0092b0c33cac266718a))
+
 # [1.4.0](https://github.com/Nyrrell/tgtg-notifier/compare/1.3.0...1.4.0) (2026-04-03)
 
 
