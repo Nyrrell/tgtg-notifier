@@ -158,6 +158,7 @@ Configuration can be provided via:
 | `testNotifiers`         | `TGTG_TEST_NOTIFIERS`          | `false`     | Send a test notification with a fake item for all configured accounts then exit process                                         |
 | `logLevel`              | `TGTG_LOG_LEVEL`               | `info`      | Log only if level is less than or equal to this [level](https://github.com/winstonjs/winston?tab=readme-ov-file#logging-levels) |
 | `port`                  | `TGTG_PORT`                    | `3000`      | Port used by the HTTP server to prompt the PIN code                                                                             |
+| `host`                  | `TGTG_HOST`                    | `localhost` | Hostname displayed in logs for the HTTP server URL                                                                              |
 
 ## Run
 First you need to install [Node.js](https://nodejs.org/) 22.14.0 or higher

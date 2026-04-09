@@ -1,7 +1,7 @@
 import * as http from 'node:http';
 
 import { logger } from '../common/logger.ts';
-import { PORT } from '../config.ts';
+import { HOST, PORT } from '../config.ts';
 
 export const promptPin = (): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -35,7 +35,7 @@ export const promptPin = (): Promise<string> => {
     });
 
     server.listen(PORT, () => {
-      logger.info(`Enter your PIN here at http://localhost:${PORT}`);
+      logger.info(`Enter your PIN here at http://${HOST}:${PORT}`);
     });
 
     server.on('error', reject);
