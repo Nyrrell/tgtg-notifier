@@ -1,16 +1,17 @@
-FROM node:22-alpine
-
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-ENV CI=true
-
+FROM node:22-alpine AS builder
+WORKDIR /app
 RUN corepack enable
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+COPY . .
+RUN pnpm run build
 
+FROM node:22-alpine AS runner
 WORKDIR /usr/app
-COPY ./ ./
+RUN corepack enable
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile --prod
+COPY --from=builder /app/dist ./
 
-RUN pnpm install --frozen-lockfile \
-  && pnpm build \
-  && pnpm prune --prod
-
-CMD pnpm start
+RUN pnpm rebuild better-sqlite3
+CMD ["node", "app.js"]
