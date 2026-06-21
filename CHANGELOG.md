@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/Nyrrell/tgtg-notifier/compare/1.4.1...1.4.2) (2026-06-21)
+
+
+### Bug Fixes
+
+* docker build sqlite3, fix packageManager to pnpm@10.33.2 ([df24221](https://github.com/Nyrrell/tgtg-notifier/commit/df24221eef8a019b80adb4bdeab5822f47ffc473))
+
 ## [1.4.1](https://github.com/Nyrrell/tgtg-notifier/compare/1.4.0...1.4.1) (2026-04-09)
 
 
