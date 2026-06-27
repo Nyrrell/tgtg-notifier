@@ -82,7 +82,9 @@ configuration.
 - **token** : *string* = `RFRNGDQmCgboyVF`
     - On the Gotify web UI, Apps > Create Application > reveal the token
 - **priority**? : *number* = `10`
-    - The priority level sent with the message (Default 5)
+    - The priority level sent with the message
+    - If unset, then the default priority of the
+      application will be used
 
 </details>
 
